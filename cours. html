@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cours</title>
+</head>
+<body>
+
+<h1>📖 Cours</h1>
+
+<p>Théorème de Pythagore :</p>
+<p>a² + b² = c²</p>
+
+<a href="index.html">⬅ Retour</a>
+
+</body>
+</html>
