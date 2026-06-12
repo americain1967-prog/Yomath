@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quiz</title>
+<title>Quiz Avancé</title>
 
 <style>
 body {
@@ -21,17 +21,14 @@ button {
     font-size: 16px;
 }
 
-.correct { background: green; }
-.wrong { background: red; }
 </style>
 </head>
 
 <body>
 
-<h1>🧠 Quiz</h1>
+<h1>🧠 Quiz Avancé</h1>
 
 <p id="question"></p>
-
 <div id="answers"></div>
 
 <p id="result"></p>
@@ -42,26 +39,42 @@ let score = 0;
 let index = 0;
 
 const quiz = [
-    {
-        q: "Capitale du Burkina Faso ?",
-        a: ["Ouagadougou", "Bobo-Dioulasso"],
-        correct: 0
-    },
-    {
-        q: "2 + 2 = ?",
-        a: ["3", "4"],
-        correct: 1
-    },
-    {
-        q: "Couleur du ciel ?",
-        a: ["Bleu", "Vert"],
-        correct: 0
-    }
+
+{
+q: "Quelle est la dérivée de x² ?",
+a: ["2x", "x", "x²"],
+correct: 0
+},
+
+{
+q: "Valeur de g = ?",
+a: ["9.8 m/s²", "10 m/s²", "8 m/s²"],
+correct: 0
+},
+
+{
+q: "Résoudre : 2x + 3 = 7",
+a: ["x = 2", "x = 3", "x = 1"],
+correct: 0
+},
+
+{
+q: "Formule de l’énergie cinétique ?",
+a: ["1/2 mv²", "mv²", "mgh"],
+correct: 0
+},
+
+{
+q: "Limite de 1/x quand x → +∞",
+a: ["0", "1", "∞"],
+correct: 0
+}
+
 ];
 
 function loadQuestion(){
     if(index >= quiz.length){
-        document.getElementById("question").innerText = "🎉 Quiz terminé";
+        document.getElementById("question").innerText = "🎉 Quiz terminé !";
         document.getElementById("answers").innerHTML = "";
         return;
     }
