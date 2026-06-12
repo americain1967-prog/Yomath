@@ -2,114 +2,181 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quiz Avancé</title>
+<title>Quiz Pro</title>
 
 <style>
 body {
     font-family: Arial;
-    background: #111;
+    background: #0f172a;
     color: white;
     text-align: center;
 }
 
+.container {
+    padding: 20px;
+}
+
 button {
-    margin: 10px;
+    display: block;
+    margin: 10px auto;
     padding: 12px;
     border-radius: 10px;
     border: none;
+    width: 80%;
     cursor: pointer;
-    font-size: 16px;
 }
 
+.correct { background: green; }
+.wrong { background: red; }
+
+.select {
+    margin: 20px;
+}
 </style>
 </head>
 
 <body>
 
-<h1>🧠 Quiz Avancé</h1>
+<div class="container">
 
-<p id="question"></p>
-<div id="answers"></div>
+<h1>🧠 Quiz Pro</h1>
 
-<p id="result"></p>
-<p id="score">Score : 0</p>
+<div id="menu">
+    <p>Choisir niveau :</p>
+    <button onclick="startQuiz('easy')">Facile</button>
+    <button onclick="startQuiz('medium')">Moyen</button>
+    <button onclick="startQuiz('hard')">Difficile</button>
+</div>
+
+<div id="quiz" style="display:none;">
+    <p id="timer">Temps : 30</p>
+    <p id="question"></p>
+    <div id="answers"></div>
+    <p id="result"></p>
+    <p id="score">Score : 0</p>
+</div>
+
+<div id="end" style="display:none;">
+    <h2 id="final"></h2>
+    <button onclick="location.reload()">Rejouer</button>
+</div>
+
+</div>
 
 <script>
+
 let score = 0;
 let index = 0;
+let timer;
+let timeLeft = 30;
+let currentQuiz = [];
 
-const quiz = [
+const questions = {
+easy: [
+{q:"2+2=?", a:["4","3","5"], c:0},
+{q:"Couleur ciel ?", a:["Bleu","Vert","Rouge"], c:0},
+{q:"5-3=?", a:["2","1","3"], c:0},
+{q:"3x1=?", a:["3","1","0"], c:0},
+{q:"10/2=?", a:["5","2","10"], c:0},
+{q:"1+1=?", a:["2","3","1"], c:0},
+{q:"4+1=?", a:["5","4","6"], c:0}
+],
 
-{
-q: "Quelle est la dérivée de x² ?",
-a: ["2x", "x", "x²"],
-correct: 0
-},
+medium: [
+{q:"2x+3=7 ?", a:["2","3","1"], c:0},
+{q:"g=?", a:["9.8","8","10"], c:0},
+{q:"10²=?", a:["100","10","20"], c:0},
+{q:"√16=?", a:["4","8","2"], c:0},
+{q:"3²=?", a:["9","6","3"], c:0},
+{q:"5x=25 ?", a:["5","4","6"], c:0},
+{q:"100/4=?", a:["25","20","40"], c:0}
+],
 
-{
-q: "Valeur de g = ?",
-a: ["9.8 m/s²", "10 m/s²", "8 m/s²"],
-correct: 0
-},
+hard: [
+{q:"d/dx x²=?", a:["2x","x","x²"], c:0},
+{q:"lim 1/x → ∞ ?", a:["0","1","∞"], c:0},
+{q:"Energie cinétique ?", a:["1/2mv²","mv²","mgh"], c:0},
+{q:"sin(90°) ?", a:["1","0","-1"], c:0},
+{q:"ln(e) ?", a:["1","0","e"], c:0},
+{q:"Vecteur nul norme ?", a:["0","1","∞"], c:0},
+{q:"f(x)=x² dérivée ?", a:["2x","x","1"], c:0}
+]
+};
 
-{
-q: "Résoudre : 2x + 3 = 7",
-a: ["x = 2", "x = 3", "x = 1"],
-correct: 0
-},
+function startQuiz(level){
+    document.getElementById("menu").style.display="none";
+    document.getElementById("quiz").style.display="block";
 
-{
-q: "Formule de l’énergie cinétique ?",
-a: ["1/2 mv²", "mv²", "mgh"],
-correct: 0
-},
-
-{
-q: "Limite de 1/x quand x → +∞",
-a: ["0", "1", "∞"],
-correct: 0
+    currentQuiz = questions[level];
+    loadQuestion();
+    startTimer();
 }
 
-];
-
 function loadQuestion(){
-    if(index >= quiz.length){
-        document.getElementById("question").innerText = "🎉 Quiz terminé !";
-        document.getElementById("answers").innerHTML = "";
+    if(index >= currentQuiz.length){
+        endQuiz();
         return;
     }
 
-    let q = quiz[index];
+    let q = currentQuiz[index];
     document.getElementById("question").innerText = q.q;
 
-    let html = "";
-    q.a.forEach((ans, i) => {
-        html += `<button onclick="check(${i})">${ans}</button>`;
+    let html="";
+    q.a.forEach((ans,i)=>{
+        html+=`<button onclick="check(${i})">${ans}</button>`;
     });
 
-    document.getElementById("answers").innerHTML = html;
+    document.getElementById("answers").innerHTML=html;
 }
 
 function check(i){
-    let q = quiz[index];
+    let q = currentQuiz[index];
 
-    if(i === q.correct){
+    if(i === q.c){
         score++;
-        document.getElementById("result").innerText = "✔ Bonne réponse";
+        document.getElementById("result").innerText="✔ Bonne réponse";
     } else {
-        document.getElementById("result").innerText = "❌ Mauvaise réponse";
+        document.getElementById("result").innerText="❌ Mauvaise réponse";
     }
 
-    document.getElementById("score").innerText = "Score : " + score;
+    document.getElementById("score").innerText="Score : "+score;
 
     index++;
-    setTimeout(loadQuestion, 1000);
+    setTimeout(loadQuestion,800);
 }
 
-loadQuestion();
-</script>
+function startTimer(){
+    timer = setInterval(()=>{
+        timeLeft--;
+        document.getElementById("timer").innerText="Temps : "+timeLeft;
 
-<a href="index.html">Retour</a>
+        if(timeLeft <= 0){
+            clearInterval(timer);
+            endQuiz();
+        }
+    },1000);
+}
+
+function endQuiz(){
+    clearInterval(timer);
+    document.getElementById("quiz").style.display="none";
+    document.getElementById("end").style.display="block";
+
+    let message = "";
+
+    if(score >= 5){
+        message="🔥 Excellent !";
+    } else if(score >=3){
+        message="👍 Bon travail";
+    } else {
+        message="💪 Continue à t'entraîner";
+    }
+
+    document.getElementById("final").innerText=
+    "Score final : "+score+" / "+currentQuiz.length+" - "+message;
+}
+
+</script>
 
 </body>
 </html>
