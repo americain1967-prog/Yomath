@@ -5,12 +5,12 @@
 </head>
 <body>
 
-<h1>📖 Cours</h1>
+<h1 data-key="cours_title">📖 Cours</h1>
 
 <p>Théorème de Pythagore :</p>
 <p>a² + b² = c²</p>
 
 <a href="index.html">⬅ Retour</a>
-
+cours_title: "📖 Cours"
 </body>
 </html>
