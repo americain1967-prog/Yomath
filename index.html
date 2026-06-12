@@ -7,14 +7,11 @@
 <style>
 body {
     <body>
-
 <div style="position:absolute; top:10px; right:10px;">
     <button onclick="setLang('fr')">FR</button>
     <button onclick="setLang('en')">EN</button>
 </div>
-
-👉 le reste du site
-  <h1 id="title">📚 Plateforme éducative</h1>
+<h1 id="title">📚 Plateforme éducative</h1>
 
 <div class="container">
     <a href="cours.html" class="card" id="cours">📖 Cours</a>
@@ -22,8 +19,31 @@ body {
     <a href="quiz.html" class="card" id="quiz">🧠 Quiz</a>
     <a href="corrections.html" class="card" id="corrections">✅ Corrections</a>
 </div>
- <script>
-...code langue...
+<script>
+const langData = {
+    fr: {
+        title: "📚 Plateforme éducative",
+        cours: "📖 Cours",
+        devoirs: "✏️ Devoirs",
+        quiz: "🧠 Quiz",
+        corrections: "✅ Corrections"
+    },
+    en: {
+        title: "📚 Educational Platform",
+        cours: "📖 Courses",
+        devoirs: "✏️ Homework",
+        quiz: "🧠 Quiz",
+        corrections: "✅ Corrections"
+    }
+};
+
+function setLang(lang){
+    document.getElementById("title").innerText = langData[lang].title;
+    document.getElementById("cours").innerText = langData[lang].cours;
+    document.getElementById("devoirs").innerText = langData[lang].devoirs;
+    document.getElementById("quiz").innerText = langData[lang].quiz;
+    document.getElementById("corrections").innerText = langData[lang].corrections;
+}
 </script>
 
 </body>
