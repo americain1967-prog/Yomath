@@ -6,16 +6,28 @@
 
 <style>
 body {
-    font-family: Arial, sans-serif;
+    font-family: Arial;
     margin: 0;
     background: linear-gradient(135deg, #1e3c72, #2a5298);
     color: white;
     text-align: center;
 }
 
+.lang {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+button {
+    margin: 3px;
+    padding: 6px;
+    border-radius: 8px;
+    border: none;
+}
+
 .container {
     display: grid;
-    grid-template-columns: 1fr;
     gap: 20px;
     padding: 20px;
 }
@@ -27,29 +39,6 @@ body {
     border-radius: 15px;
     text-decoration: none;
     font-weight: bold;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-    transition: 0.3s;
-}
-
-.card:hover {
-    transform: translateY(-5px);
-}
-
-.lang {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-}
-
-button {
-    padding: 8px;
-    margin: 5px;
-}
-
-@media(min-width:600px){
-    .container {
-        grid-template-columns: 1fr 1fr;
-    }
 }
 </style>
 </head>
@@ -59,19 +48,23 @@ button {
 <div class="lang">
     <button onclick="setLang('fr')">FR</button>
     <button onclick="setLang('en')">EN</button>
+    <button onclick="setLang('es')">ES</button>
+    <button onclick="setLang('pt')">PT</button>
+    <button onclick="setLang('moore')">MO</button>
+    <button onclick="setLang('dioula')">DI</button>
 </div>
 
-<h1 id="title">📚 Plateforme éducative</h1>
+<h1 data-key="title">📚 Plateforme éducative</h1>
 
 <div class="container">
-    <a href="cours.html" class="card" id="cours">📖 Cours</a>
-    <a href="devoirs.html" class="card" id="devoirs">✏️ Devoirs</a>
-    <a href="quiz.html" class="card" id="quiz">🧠 Quiz</a>
-    <a href="corrections.html" class="card" id="corrections">✅ Corrections</a>
+    <a href="cours.html" class="card" data-key="cours">📖 Cours</a>
+    <a href="devoirs.html" class="card" data-key="devoirs">✏️ Devoirs</a>
+    <a href="quiz.html" class="card" data-key="quiz">🧠 Quiz</a>
+    <a href="corrections.html" class="card" data-key="corrections">✅ Corrections</a>
 </div>
 
 <script>
-const langData = {
+const translations = {
     fr: {
         title: "📚 Plateforme éducative",
         cours: "📖 Cours",
@@ -85,15 +78,49 @@ const langData = {
         devoirs: "✏️ Homework",
         quiz: "🧠 Quiz",
         corrections: "✅ Corrections"
+    },
+    es: {
+        title: "📚 Plataforma educativa",
+        cours: "📖 Cursos",
+        devoirs: "✏️ Tareas",
+        quiz: "🧠 Quiz",
+        corrections: "✅ Correcciones"
+    },
+    pt: {
+        title: "📚 Plataforma educacional",
+        cours: "📖 Cursos",
+        devoirs: "✏️ Tarefas",
+        quiz: "🧠 Quiz",
+        corrections: "✅ Correções"
+    },
+    moore: {
+        title: "📚 Zãabre yelemdé",
+        cours: "📖 Zãabre",
+        devoirs: "✏️ Kibaré",
+        quiz: "🧠 Quiz",
+        corrections: "✅ Barka"
+    },
+    dioula: {
+        title: "📚 Plateforme école",
+        cours: "📖 Cours",
+        devoirs: "✏️ Devoirs",
+        quiz: "🧠 Quiz",
+        corrections: "✅ Corrections"
     }
 };
 
 function setLang(lang){
-    document.getElementById("title").innerText = langData[lang].title;
-    document.getElementById("cours").innerText = langData[lang].cours;
-    document.getElementById("devoirs").innerText = langData[lang].devoirs;
-    document.getElementById("quiz").innerText = langData[lang].quiz;
-    document.getElementById("corrections").innerText = langData[lang].corrections;
+    localStorage.setItem("lang", lang);
+
+    document.querySelectorAll("[data-key]").forEach(el => {
+        const key = el.getAttribute("data-key");
+        el.innerText = translations[lang][key];
+    });
+}
+
+window.onload = function(){
+    let lang = localStorage.getItem("lang") || "fr";
+    setLang(lang);
 }
 </script>
 
