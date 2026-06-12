@@ -2,180 +2,57 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quiz Pro</title>
+<title>Quiz</title>
 
 <style>
 body {
     font-family: Arial;
-    background: #0f172a;
+    background: #111;
     color: white;
     text-align: center;
 }
-
-.container {
-    padding: 20px;
-}
-
 button {
-    display: block;
-    margin: 10px auto;
+    margin: 10px;
     padding: 12px;
     border-radius: 10px;
     border: none;
-    width: 80%;
-    cursor: pointer;
-}
-
-.correct { background: green; }
-.wrong { background: red; }
-
-.select {
-    margin: 20px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
+<h1 data-key="quiz_title">🧠 Quiz</h1>
+<p data-key="quiz_text">Réponds aux questions</p>
 
-<h1>🧠 Quiz Pro</h1>
-
-<div id="menu">
-    <p>Choisir niveau :</p>
-    <button onclick="startQuiz('easy')">Facile</button>
-    <button onclick="startQuiz('medium')">Moyen</button>
-    <button onclick="startQuiz('hard')">Difficile</button>
-</div>
-
-<div id="quiz" style="display:none;">
-    <p id="timer">Temps : 30</p>
-    <p id="question"></p>
-    <div id="answers"></div>
-    <p id="result"></p>
-    <p id="score">Score : 0</p>
-</div>
-
-<div id="end" style="display:none;">
-    <h2 id="final"></h2>
-    <button onclick="location.reload()">Rejouer</button>
-</div>
-
-</div>
+<a href="index.html" data-key="back">⬅ Retour</a>
 
 <script>
-
-let score = 0;
-let index = 0;
-let timer;
-let timeLeft = 30;
-let currentQuiz = [];
-
-const questions = {
-easy: [
-{q:"2+2=?", a:["4","3","5"], c:0},
-{q:"Couleur ciel ?", a:["Bleu","Vert","Rouge"], c:0},
-{q:"5-3=?", a:["2","1","3"], c:0},
-{q:"3x1=?", a:["3","1","0"], c:0},
-{q:"10/2=?", a:["5","2","10"], c:0},
-{q:"1+1=?", a:["2","3","1"], c:0},
-{q:"4+1=?", a:["5","4","6"], c:0}
-],
-
-medium: [
-{q:"2x+3=7 ?", a:["2","3","1"], c:0},
-{q:"g=?", a:["9.8","8","10"], c:0},
-{q:"10²=?", a:["100","10","20"], c:0},
-{q:"√16=?", a:["4","8","2"], c:0},
-{q:"3²=?", a:["9","6","3"], c:0},
-{q:"5x=25 ?", a:["5","4","6"], c:0},
-{q:"100/4=?", a:["25","20","40"], c:0}
-],
-
-hard: [
-{q:"d/dx x²=?", a:["2x","x","x²"], c:0},
-{q:"lim 1/x → ∞ ?", a:["0","1","∞"], c:0},
-{q:"Energie cinétique ?", a:["1/2mv²","mv²","mgh"], c:0},
-{q:"sin(90°) ?", a:["1","0","-1"], c:0},
-{q:"ln(e) ?", a:["1","0","e"], c:0},
-{q:"Vecteur nul norme ?", a:["0","1","∞"], c:0},
-{q:"f(x)=x² dérivée ?", a:["2x","x","1"], c:0}
-]
+const translations = {
+    fr: {
+        quiz_title: "🧠 Quiz",
+        quiz_text: "Réponds aux questions",
+        back: "⬅ Retour"
+    },
+    en: {
+        quiz_title: "🧠 Quiz",
+        quiz_text: "Answer the questions",
+        back: "⬅ Back"
+    }
 };
 
-function startQuiz(level){
-    document.getElementById("menu").style.display="none";
-    document.getElementById("quiz").style.display="block";
+function setLang(lang){
+    localStorage.setItem("lang", lang);
 
-    currentQuiz = questions[level];
-    loadQuestion();
-    startTimer();
-}
-
-function loadQuestion(){
-    if(index >= currentQuiz.length){
-        endQuiz();
-        return;
-    }
-
-    let q = currentQuiz[index];
-    document.getElementById("question").innerText = q.q;
-
-    let html="";
-    q.a.forEach((ans,i)=>{
-        html+=`<button onclick="check(${i})">${ans}</button>`;
+    document.querySelectorAll("[data-key]").forEach(el=>{
+        let key = el.getAttribute("data-key");
+        el.innerText = translations[lang][key];
     });
-
-    document.getElementById("answers").innerHTML=html;
 }
 
-function check(i){
-    let q = currentQuiz[index];
-
-    if(i === q.c){
-        score++;
-        document.getElementById("result").innerText="✔ Bonne réponse";
-    } else {
-        document.getElementById("result").innerText="❌ Mauvaise réponse";
-    }
-
-    document.getElementById("score").innerText="Score : "+score;
-
-    index++;
-    setTimeout(loadQuestion,800);
+window.onload = ()=>{
+    setLang(localStorage.getItem("lang") || "fr");
 }
-
-function startTimer(){
-    timer = setInterval(()=>{
-        timeLeft--;
-        document.getElementById("timer").innerText="Temps : "+timeLeft;
-
-        if(timeLeft <= 0){
-            clearInterval(timer);
-            endQuiz();
-        }
-    },1000);
-}
-
-function endQuiz(){
-    clearInterval(timer);
-    document.getElementById("quiz").style.display="none";
-    document.getElementById("end").style.display="block";
-
-    let message = "";
-
-    if(score >= 5){
-        message="🔥 Excellent !";
-    } else if(score >=3){
-        message="👍 Bon travail";
-    } else {
-        message="💪 Continue à t'entraîner";
-    }
-
-    document.getElementById("final").innerText=
-    "Score final : "+score+" / "+currentQuiz.length+" - "+message;
-}
-
 </script>
 
 </body>
