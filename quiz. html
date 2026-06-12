@@ -2,18 +2,53 @@
 <html>
 <head>
     <title>Quiz</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #222;
+            color: white;
+            text-align: center;
+        }
+
+        button {
+            margin: 10px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .correct { background: green; color: white; }
+        .wrong { background: red; color: white; }
+    </style>
 </head>
+
 <body>
 
 <h1>🧠 Quiz</h1>
 
 <p>Capitale du Burkina Faso ?</p>
 
-<button>Ouagadougou</button>
-<button>Bobo-Dioulasso</button>
+<button onclick="check(this, true)">Ouagadougou</button>
+<button onclick="check(this, false)">Bobo-Dioulasso</button>
 
-<br><br>
-<a href="index.html">⬅ Retour</a>
+<p id="result"></p>
+
+<script>
+function check(btn, isCorrect) {
+    let result = document.getElementById("result");
+
+    if (isCorrect) {
+        btn.classList.add("correct");
+        result.innerText = "✔ Bonne réponse !";
+    } else {
+        btn.classList.add("wrong");
+        result.innerText = "❌ Mauvaise réponse";
+    }
+}
+</script>
+
+<a href="index.html">Retour</a>
 
 </body>
 </html>
