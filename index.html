@@ -2,17 +2,53 @@
 <html>
 <head>
     <title>Plateforme éducative</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            text-align: center;
+            color: white;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            margin-top: 50px;
+        }
+
+        .menu {
+            margin-top: 50px;
+        }
+
+        .menu a {
+            display: block;
+            margin: 15px auto;
+            padding: 15px;
+            width: 200px;
+            background: white;
+            color: #333;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .menu a:hover {
+            background: #333;
+            color: white;
+        }
+    </style>
 </head>
 <body>
 
 <h1>📚 Plateforme éducative</h1>
 
-<ul>
-    <li><a href="cours.html">📖 Cours</a></li>
-    <li><a href="devoirs.html">✏️ Devoirs</a></li>
-    <li><a href="quiz.html">🧠 Quiz</a></li>
-    <li><a href="corrections.html">✅ Corrections</a></li>
-</ul>
+<div class="menu">
+    <a href="cours.html">📖 Cours</a>
+    <a href="devoirs.html">✏️ Devoirs</a>
+    <a href="quiz.html">🧠 Quiz</a>
+    <a href="corrections.html">✅ Corrections</a>
+</div>
 
 </body>
 </html>
