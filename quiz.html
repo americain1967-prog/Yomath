@@ -1,26 +1,28 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Quiz</title>
-    <style>
-        body {
-            font-family: Arial;
-            background: #222;
-            color: white;
-            text-align: center;
-        }
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz</title>
 
-        button {
-            margin: 10px;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-        }
+<style>
+body {
+    font-family: Arial;
+    background: #111;
+    color: white;
+    text-align: center;
+}
 
-        .correct { background: green; color: white; }
-        .wrong { background: red; color: white; }
-    </style>
+button {
+    margin: 10px;
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+}
+
+.correct { background: green; }
+.wrong { background: red; }
+</style>
 </head>
 
 <body>
@@ -29,22 +31,31 @@
 
 <p>Capitale du Burkina Faso ?</p>
 
-<button onclick="check(this, true)">Ouagadougou</button>
-<button onclick="check(this, false)">Bobo-Dioulasso</button>
+<button onclick="check(true)">Ouagadougou</button>
+<button onclick="check(false)">Bobo-Dioulasso</button>
 
 <p id="result"></p>
+<p id="score">Score : 0</p>
 
 <script>
-function check(btn, isCorrect) {
-    let result = document.getElementById("result");
+let score = 0;
+let answered = false;
 
-    if (isCorrect) {
-        btn.classList.add("correct");
-        result.innerText = "✔ Bonne réponse !";
+function check(isCorrect){
+    if(answered) return;
+
+    let result = document.getElementById("result");
+    let scoreText = document.getElementById("score");
+
+    if(isCorrect){
+        score++;
+        result.innerText = "✔ Bonne réponse";
     } else {
-        btn.classList.add("wrong");
         result.innerText = "❌ Mauvaise réponse";
     }
+
+    scoreText.innerText = "Score : " + score;
+    answered = true;
 }
 </script>
 
