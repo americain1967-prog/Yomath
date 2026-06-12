@@ -6,11 +6,61 @@
 
 <style>
 body {
-    <body>
-<div style="position:absolute; top:10px; right:10px;">
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    color: white;
+    text-align: center;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 20px;
+}
+
+.card {
+    background: white;
+    color: black;
+    padding: 20px;
+    border-radius: 15px;
+    text-decoration: none;
+    font-weight: bold;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    transition: 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.lang {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+button {
+    padding: 8px;
+    margin: 5px;
+}
+
+@media(min-width:600px){
+    .container {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="lang">
     <button onclick="setLang('fr')">FR</button>
     <button onclick="setLang('en')">EN</button>
 </div>
+
 <h1 id="title">📚 Plateforme éducative</h1>
 
 <div class="container">
@@ -19,6 +69,7 @@ body {
     <a href="quiz.html" class="card" id="quiz">🧠 Quiz</a>
     <a href="corrections.html" class="card" id="corrections">✅ Corrections</a>
 </div>
+
 <script>
 const langData = {
     fr: {
@@ -45,8 +96,6 @@ function setLang(lang){
     document.getElementById("corrections").innerText = langData[lang].corrections;
 }
 </script>
-
-</body>
 
 </body>
 </html>
