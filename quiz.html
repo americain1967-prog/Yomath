@@ -14,10 +14,11 @@ body {
 
 button {
     margin: 10px;
-    padding: 10px 20px;
+    padding: 12px 20px;
     border-radius: 10px;
     border: none;
     cursor: pointer;
+    font-size: 16px;
 }
 
 .correct { background: green; }
@@ -31,8 +32,8 @@ button {
 
 <p>Capitale du Burkina Faso ?</p>
 
-<button onclick="check(true)">Ouagadougou</button>
-<button onclick="check(false)">Bobo-Dioulasso</button>
+<button onclick="check(this, true)">Ouagadougou</button>
+<button onclick="check(this, false)">Bobo-Dioulasso</button>
 
 <p id="result"></p>
 <p id="score">Score : 0</p>
@@ -41,7 +42,7 @@ button {
 let score = 0;
 let answered = false;
 
-function check(isCorrect){
+function check(btn, isCorrect){
     if(answered) return;
 
     let result = document.getElementById("result");
@@ -49,8 +50,10 @@ function check(isCorrect){
 
     if(isCorrect){
         score++;
+        btn.classList.add("correct");
         result.innerText = "✔ Bonne réponse";
     } else {
+        btn.classList.add("wrong");
         result.innerText = "❌ Mauvaise réponse";
     }
 
