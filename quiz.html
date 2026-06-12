@@ -14,7 +14,7 @@ body {
 
 button {
     margin: 10px;
-    padding: 12px 20px;
+    padding: 12px;
     border-radius: 10px;
     border: none;
     cursor: pointer;
@@ -30,36 +30,70 @@ button {
 
 <h1>🧠 Quiz</h1>
 
-<p>Capitale du Burkina Faso ?</p>
+<p id="question"></p>
 
-<button onclick="check(this, true)">Ouagadougou</button>
-<button onclick="check(this, false)">Bobo-Dioulasso</button>
+<div id="answers"></div>
 
 <p id="result"></p>
 <p id="score">Score : 0</p>
 
 <script>
 let score = 0;
-let answered = false;
+let index = 0;
 
-function check(btn, isCorrect){
-    if(answered) return;
+const quiz = [
+    {
+        q: "Capitale du Burkina Faso ?",
+        a: ["Ouagadougou", "Bobo-Dioulasso"],
+        correct: 0
+    },
+    {
+        q: "2 + 2 = ?",
+        a: ["3", "4"],
+        correct: 1
+    },
+    {
+        q: "Couleur du ciel ?",
+        a: ["Bleu", "Vert"],
+        correct: 0
+    }
+];
 
-    let result = document.getElementById("result");
-    let scoreText = document.getElementById("score");
-
-    if(isCorrect){
-        score++;
-        btn.classList.add("correct");
-        result.innerText = "✔ Bonne réponse";
-    } else {
-        btn.classList.add("wrong");
-        result.innerText = "❌ Mauvaise réponse";
+function loadQuestion(){
+    if(index >= quiz.length){
+        document.getElementById("question").innerText = "🎉 Quiz terminé";
+        document.getElementById("answers").innerHTML = "";
+        return;
     }
 
-    scoreText.innerText = "Score : " + score;
-    answered = true;
+    let q = quiz[index];
+    document.getElementById("question").innerText = q.q;
+
+    let html = "";
+    q.a.forEach((ans, i) => {
+        html += `<button onclick="check(${i})">${ans}</button>`;
+    });
+
+    document.getElementById("answers").innerHTML = html;
 }
+
+function check(i){
+    let q = quiz[index];
+
+    if(i === q.correct){
+        score++;
+        document.getElementById("result").innerText = "✔ Bonne réponse";
+    } else {
+        document.getElementById("result").innerText = "❌ Mauvaise réponse";
+    }
+
+    document.getElementById("score").innerText = "Score : " + score;
+
+    index++;
+    setTimeout(loadQuestion, 1000);
+}
+
+loadQuestion();
 </script>
 
 <a href="index.html">Retour</a>
