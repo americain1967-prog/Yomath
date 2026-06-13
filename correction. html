@@ -20,9 +20,9 @@ body {
 <p data-key="corr_text">Vérifie tes réponses ici</p>
 
 <a href="index.html" data-key="back">⬅ Retour</a>
-
+<script scr="lang.js"></script>
 <script>
-const translations = {
+const translations = applyLang() ;
     fr: {
         corr_title: "✅ Corrections",
         corr_text: "Vérifie tes réponses ici",
@@ -40,7 +40,7 @@ function setLang(lang){
 
     document.querySelectorAll("[data-key]").forEach(el=>{
         let key = el.getAttribute("data-key");
-        el.innerText = translations[lang][key];
+        el.innerText = translations[applyLang();] 
     });
 }
 
