@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quiz</title>
+<title>Quiz Pro</title>
 
 <style>
 body {
@@ -16,43 +16,85 @@ button {
     padding: 12px;
     border-radius: 10px;
     border: none;
+    width: 80%;
 }
 </style>
 </head>
 
 <body>
 
-<h1 data-key="quiz_title">🧠 Quiz</h1>
-<p data-key="quiz_text">Réponds aux questions</p>
+<h1 data-key="title">🧠 Quiz</h1>
+
+<p id="question"></p>
+<div id="answers"></div>
+
+<p id="score"></p>
 
 <a href="index.html" data-key="back">⬅ Retour</a>
 
 <script>
-const translations = {
-    fr: {
-        quiz_title: "🧠 Quiz",
-        quiz_text: "Réponds aux questions",
-        back: "⬅ Retour"
-    },
-    en: {
-        quiz_title: "🧠 Quiz",
-        quiz_text: "Answer the questions",
-        back: "⬅ Back"
-    }
+let lang = localStorage.getItem("lang") || "fr";
+
+const data = {
+fr: [
+{q:"Capitale du Burkina Faso ?", a:["Ouagadougou","Bobo"], c:0},
+{q:"2+2=?", a:["3","4"], c:1},
+{q:"dérivée de x² ?", a:["2x","x"], c:0}
+],
+en: [
+{q:"Capital of Burkina Faso?", a:["Ouagadougou","Bobo"], c:0},
+{q:"2+2=?", a:["3","4"], c:1},
+{q:"derivative of x²?", a:["2x","x"], c:0}
+]
 };
 
-function setLang(lang){
-    localStorage.setItem("lang", lang);
+let index = 0;
+let score = 0;
 
+function load(){
+    let q = data[lang][index];
+    document.getElementById("question").innerText = q.q;
+
+    let html="";
+    q.a.forEach((ans,i)=>{
+        html += `<button onclick="check(${i})">${ans}</button>`;
+    });
+
+    document.getElementById("answers").innerHTML = html;
+    document.getElementById("score").innerText = "Score : "+score;
+}
+
+function check(i){
+    let q = data[lang][index];
+
+    if(i===q.c) score++;
+
+    index++;
+
+    if(index >= data[lang].length){
+        document.getElementById("question").innerText = "🎉 Fin du quiz";
+        document.getElementById("answers").innerHTML="";
+        return;
+    }
+
+    load();
+}
+
+// multi-langue
+const translations = {
+    fr: {title:"🧠 Quiz", back:"⬅ Retour"},
+    en: {title:"🧠 Quiz", back:"⬅ Back"}
+};
+
+function applyLang(){
     document.querySelectorAll("[data-key]").forEach(el=>{
         let key = el.getAttribute("data-key");
         el.innerText = translations[lang][key];
     });
 }
 
-window.onload = ()=>{
-    setLang(localStorage.getItem("lang") || "fr");
-}
+applyLang();
+load();
 </script>
 
 </body>
