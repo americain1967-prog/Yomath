@@ -1,17 +1,53 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Corrections</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Corrections</title>
+
+<style>
+body {
+    font-family: Arial;
+    background: #0f172a;
+    color: white;
+    text-align: center;
+}
+</style>
 </head>
+
 <body>
 
-<h1>✅ Corrections</h1>
+<h1 data-key="corr_title">✅ Corrections</h1>
+<p data-key="corr_text">Vérifie tes réponses ici</p>
 
-<p>2x + 3 = 7 → x = 2</p>
+<a href="index.html" data-key="back">⬅ Retour</a>
 
-<p>Pythagore : a² + b² = c²</p>
+<script>
+const translations = {
+    fr: {
+        corr_title: "✅ Corrections",
+        corr_text: "Vérifie tes réponses ici",
+        back: "⬅ Retour"
+    },
+    en: {
+        corr_title: "✅ Corrections",
+        corr_text: "Check your answers here",
+        back: "⬅ Back"
+    }
+};
 
-<a href="index.html">⬅ Retour</a>
+function setLang(lang){
+    localStorage.setItem("lang", lang);
+
+    document.querySelectorAll("[data-key]").forEach(el=>{
+        let key = el.getAttribute("data-key");
+        el.innerText = translations[lang][key];
+    });
+}
+
+window.onload = ()=>{
+    setLang(localStorage.getItem("lang") || "fr");
+}
+</script>
 
 </body>
 </html>
