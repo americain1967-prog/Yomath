@@ -35,7 +35,7 @@ const translations = applyLang() ;
     }
 };
 
-function setLang(lang){
+applyLang ();
     localStorage.setItem("lang", lang);
 
     document.querySelectorAll("[data-key]").forEach(el=>{
