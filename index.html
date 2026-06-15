@@ -110,7 +110,7 @@ const translations = {
 };
 
 function setLang(lang){
-    localStorage.setItem("lang", lang);
+    localStorage.setItem("lang", "en");
 
     document.querySelectorAll("[data-key]").forEach(el => {
         const key = el.getAttribute("data-key");
