@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quiz Pro</title>
+<title>Quiz</title>
 
 <style>
 body {
@@ -23,36 +23,46 @@ button {
 
 <body>
 
-<h1 data-key="title">🧠 Quiz</h1>
+<h1 data-key="quiz_title">🧠 Quiz</h1>
 
 <p id="question"></p>
 <div id="answers"></div>
-
 <p id="score"></p>
 
 <a href="index.html" data-key="back">⬅ Retour</a>
 
-<script>
-let lang = localStorage.getItem("lang") || "fr";
+<!-- 🔥 LANG SYSTEM -->
+<script src="lang.js"></script>
 
-const data = {
-fr: [
-{q:"Capitale du Burkina Faso ?", a:["Ouagadougou","Bobo"], c:0},
-{q:"2+2=?", a:["3","4"], c:1},
-{q:"dérivée de x² ?", a:["2x","x"], c:0}
-],
-en: [
-{q:"Capital of Burkina Faso?", a:["Ouagadougou","Bobo"], c:0},
-{q:"2+2=?", a:["3","4"], c:1},
-{q:"derivative of x²?", a:["2x","x"], c:0}
-]
+<script>
+// 🔥 langue globale
+let lang = getLang();
+
+// 🔥 questions (FR + EN seulement)
+const questions = {
+    fr: [
+        {q:"Capitale du Burkina Faso ?", a:["Ouagadougou","Bobo"], c:0},
+        {q:"2+2=?", a:["3","4"], c:1},
+        {q:"dérivée de x² ?", a:["2x","x"], c:0}
+    ],
+    en: [
+        {q:"Capital of Burkina Faso?", a:["Ouagadougou","Bobo"], c:0},
+        {q:"2+2=?", a:["3","4"], c:1},
+        {q:"Derivative of x²?", a:["2x","x"], c:0}
+    ]
 };
+
+// 🔥 fallback si langue non supportée
+if(!questions[lang]){
+    lang = "fr";
+}
 
 let index = 0;
 let score = 0;
 
 function load(){
-    let q = data[lang][index];
+    let q = questions[lang][index];
+
     document.getElementById("question").innerText = q.q;
 
     let html="";
@@ -61,40 +71,33 @@ function load(){
     });
 
     document.getElementById("answers").innerHTML = html;
-    document.getElementById("score").innerText = "Score : "+score;
+    document.getElementById("score").innerText = "Score : " + score;
 }
 
 function check(i){
-    let q = data[lang][index];
+    let q = questions[lang][index];
 
-    if(i===q.c) score++;
+    if(i === q.c){
+        score++;
+    }
 
     index++;
 
-    if(index >= data[lang].length){
+    if(index >= questions[lang].length){
         document.getElementById("question").innerText = "🎉 Fin du quiz";
-        document.getElementById("answers").innerHTML="";
+        document.getElementById("answers").innerHTML = "";
         return;
     }
 
     load();
 }
 
-// multi-langue
-const translations = {
-    fr: {title:"🧠 Quiz", back:"⬅ Retour"},
-    en: {title:"🧠 Quiz", back:"⬅ Back"}
-};
-
-function applyLang(){
-    document.querySelectorAll("[data-key]").forEach(el=>{
-        let key = el.getAttribute("data-key");
-        el.innerText = translations[lang][key];
-    });
-}
-
+// 🔥 appliquer langue interface
 applyLang();
+
+// 🔥 lancer quiz
 load();
+
 </script>
 
 </body>
