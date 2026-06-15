@@ -23,42 +23,61 @@ button {
 
 <body>
 
-<h1 data-key="quiz_title">🧠 Quiz</h1>
+<h1 id="title">🧠 Quiz</h1>
 
 <p id="question"></p>
 <div id="answers"></div>
 <p id="score"></p>
 
-<a href="index.html" data-key="back">⬅ Retour</a>
-
-<!-- 🔥 LANG SYSTEM -->
-<script src="lang.js"></script>
+<a href="index.html" id="back">⬅ Retour</a>
 
 <script>
-// 🔥 langue globale
-let lang = getLang();
 
-// 🔥 questions (FR + EN seulement)
+// 🔥 langue unique (stable)
+let lang = localStorage.getItem("lang") || "fr";
+
+// 🔥 questions
 const questions = {
     fr: [
         {q:"Capitale du Burkina Faso ?", a:["Ouagadougou","Bobo"], c:0},
-        {q:"2+2=?", a:["3","4"], c:1},
-        {q:"dérivée de x² ?", a:["2x","x"], c:0}
+        {q:"2+2=?", a:["3","4"], c:1}
     ],
     en: [
         {q:"Capital of Burkina Faso?", a:["Ouagadougou","Bobo"], c:0},
-        {q:"2+2=?", a:["3","4"], c:1},
-        {q:"Derivative of x²?", a:["2x","x"], c:0}
+        {q:"2+2=?", a:["3","4"], c:1}
     ]
 };
 
-// 🔥 fallback si langue non supportée
+// 🔥 sécurité
 if(!questions[lang]){
     lang = "fr";
 }
 
+// 🔥 interface
+const ui = {
+    fr: {
+        title: "🧠 Quiz",
+        back: "⬅ Retour",
+        end: "🎉 Fin du quiz",
+        score: "Score"
+    },
+    en: {
+        title: "🧠 Quiz",
+        back: "⬅ Back",
+        end: "🎉 Quiz finished",
+        score: "Score"
+    }
+};
+
 let index = 0;
 let score = 0;
+
+function applyLang(){
+    let used = ui[lang] ? lang : "fr";
+
+    document.getElementById("title").innerText = ui[used].title;
+    document.getElementById("back").innerText = ui[used].back;
+}
 
 function load(){
     let q = questions[lang][index];
@@ -71,7 +90,7 @@ function load(){
     });
 
     document.getElementById("answers").innerHTML = html;
-    document.getElementById("score").innerText = "Score : " + score;
+    document.getElementById("score").innerText = ui[lang].score + " : " + score;
 }
 
 function check(i){
@@ -84,7 +103,7 @@ function check(i){
     index++;
 
     if(index >= questions[lang].length){
-        document.getElementById("question").innerText = "🎉 Fin du quiz";
+        document.getElementById("question").innerText = ui[lang].end;
         document.getElementById("answers").innerHTML = "";
         return;
     }
@@ -92,10 +111,8 @@ function check(i){
     load();
 }
 
-// 🔥 appliquer langue interface
+// 🔥 lancement propre
 applyLang();
-
-// 🔥 lancer quiz
 load();
 
 </script>
