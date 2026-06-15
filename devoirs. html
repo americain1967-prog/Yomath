@@ -35,12 +35,12 @@ const translations = {
     }
 };
 
-function setLang(lang){
+applyLang();
     localStorage.setItem("lang", lang);
 
     document.querySelectorAll("[data-key]").forEach(el=>{
         let key = el.getAttribute("data-key");
-        el.innerText = translations[lang][key];
+        el.innerText = translations[applyLang();]
     });
 }
 
