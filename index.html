@@ -2,101 +2,61 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Plateforme éducative</title>
+<title>Plateforme</title>
 
 <style>
-body {
-    font-family: Arial;
-    margin: 0;
-    background: linear-gradient(135deg, #1e3c72, #2a5298);
-    color: white;
-    text-align: center;
+body{
+    font-family:Arial;
+    background:linear-gradient(135deg,#1e3c72,#2a5298);
+    color:white;
+    text-align:center;
 }
-
-.lang {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-}
-
-button {
-    margin: 3px;
-    padding: 6px;
-    border-radius: 8px;
-    border: none;
-}
-
-.container {
-    display: grid;
-    gap: 20px;
-    padding: 20px;
-}
-
-.card {
-    background: white;
-    color: black;
-    padding: 20px;
-    border-radius: 15px;
-    text-decoration: none;
-    font-weight: bold;
+button{margin:5px;padding:8px}
+.card{
+    display:block;
+    margin:10px;
+    padding:15px;
+    background:white;
+    color:black;
+    border-radius:10px;
+    text-decoration:none;
 }
 </style>
 </head>
 
 <body>
 
-<div class="lang">
-    <button onclick="setLang('fr')">FR</button>
-    <button onclick="setLang('en')">EN</button>
-</div>
+<h1 id="title">📚 Plateforme</h1>
 
-<h1 id="title">📚 Plateforme éducative</h1>
+<!-- LANGUES -->
+<button onclick="setLang('fr')">FR</button>
+<button onclick="setLang('en')">EN</button>
+<button onclick="setLang('es')">ES</button>
+<button onclick="setLang('dioula')">DI</button>
+<button onclick="setLang('moore')">MO</button>
 
-<div class="container">
-    <a href="cours.html" class="card" id="cours">📖 Cours</a>
-    <a href="devoirs.html" class="card" id="devoirs">✏️ Devoirs</a>
-    <a href="quiz.html" class="card" id="quiz">🧠 Quiz</a>
-    <a href="corrections.html" class="card" id="corrections">✅ Corrections</a>
-</div>
+<a class="card" href="quiz.html">🧠 Quiz</a>
 
 <script>
 
-// 🔥 LANGUE UNIQUE
-function setLang(lang){
-    localStorage.setItem("lang", lang);
+function setLang(l){
+    localStorage.setItem("lang",l);
     applyLang();
 }
 
-// 🔥 TRADUCTIONS
-const langData = {
-    fr: {
-        title: "📚 Plateforme éducative",
-        cours: "📖 Cours",
-        devoirs: "✏️ Devoirs",
-        quiz: "🧠 Quiz",
-        corrections: "✅ Corrections"
-    },
-    en: {
-        title: "📚 Educational Platform",
-        cours: "📖 Courses",
-        devoirs: "✏️ Homework",
-        quiz: "🧠 Quiz",
-        corrections: "✅ Corrections"
-    }
+const t={
+fr:{title:"📚 Plateforme"},
+en:{title:"📚 Platform"},
+es:{title:"📚 Plataforma"},
+dioula:{title:"📚 Kalan"},
+moore:{title:"📚 Koom"}
 };
 
-// 🔥 APPLIQUER LANGUE
 function applyLang(){
-    let lang = localStorage.getItem("lang") || "fr";
-
-    document.getElementById("title").innerText = langData[lang].title;
-    document.getElementById("cours").innerText = langData[lang].cours;
-    document.getElementById("devoirs").innerText = langData[lang].devoirs;
-    document.getElementById("quiz").innerText = langData[lang].quiz;
-    document.getElementById("corrections").innerText = langData[lang].corrections;
+    let l=localStorage.getItem("lang")||"fr";
+    document.getElementById("title").innerText=t[l]?.title||t.fr.title;
 }
 
-// 🔥 AU CHARGEMENT
 applyLang();
 
 </script>
