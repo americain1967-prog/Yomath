@@ -2,45 +2,51 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Startup Quiz</title>
+<title>Quiz Pro Ultimate</title>
 
 <style>
 body{
-    font-family:Arial;
-    background:#0f172a;
-    color:white;
-    text-align:center;
-    margin:0;
+    font-family: Arial;
+    background: #0f172a;
+    color: white;
+    text-align: center;
+    margin: 0;
 }
 
 .header{
-    padding:15px;
-    font-size:20px;
+    padding: 15px;
+    font-size: 22px;
+    font-weight: bold;
 }
 
 .box{
-    margin:10px;
+    margin: 10px;
 }
 
 button{
-    width:80%;
-    padding:12px;
-    margin:8px;
-    border:none;
-    border-radius:10px;
-    font-size:16px;
+    width: 80%;
+    padding: 12px;
+    margin: 8px;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
 }
 
 #timer{
-    font-size:18px;
-    color:orange;
+    color: orange;
+    font-size: 18px;
+}
+
+#question{
+    font-size: 18px;
+    margin: 20px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="header">🧠 Startup Quiz</div>
+<div class="header">🧠 Quiz Ultimate Startup</div>
 
 <div id="timer">⏱ 30</div>
 <div class="box" id="score">Score: 0</div>
@@ -48,36 +54,51 @@ button{
 <p id="question">Loading...</p>
 <div id="answers"></div>
 
-<!-- 🔥 STARTUP MODULES -->
+<!-- 🔥 MODULES (OBLIGATOIRE) -->
 <script src="app.js"></script>
 <script src="data.js"></script>
 <script src="api.js"></script>
 
 <script>
 
-// ======================
-// 🚀 STARTUP QUIZ ENGINE
-// ======================
+// =======================
+// 🚀 QUIZ ENGINE ULTIME
+// =======================
 
-let lang = getLang();
+let lang = localStorage.getItem("lang") || "fr";
 let i = 0;
 let score = 0;
 let time = 30;
 
-// TIMER
+// 🔥 SECURITE DATA
+if (typeof QUESTIONS === "undefined") {
+    document.getElementById("question").innerText =
+        "❌ QUESTIONS NOT LOADED (check data.js)";
+}
+
+// =======================
+// ⏱ TIMER
+// =======================
 let timer = setInterval(() => {
     time--;
     document.getElementById("timer").innerText = "⏱ " + time;
 
-    if(time <= 0){
+    if (time <= 0) {
         endQuiz();
     }
 }, 1000);
 
-// LOAD QUESTION
-function loadQuestion(){
+// =======================
+// 📌 LOAD QUESTION
+// =======================
+function loadQuestion() {
 
-    if(i >= QUESTIONS.length){
+    if (!QUESTIONS || QUESTIONS.length === 0) {
+        document.getElementById("question").innerText = "❌ No questions found";
+        return;
+    }
+
+    if (i >= QUESTIONS.length) {
         endQuiz();
         return;
     }
@@ -89,17 +110,19 @@ function loadQuestion(){
     let html = "";
 
     QUESTIONS[i].a.forEach((ans, idx) => {
-        html += `<button onclick="checkAnswer(${idx})">${ans}</button>`;
+        html += `<button onclick="check(${idx})">${ans}</button>`;
     });
 
     document.getElementById("answers").innerHTML = html;
     document.getElementById("score").innerText = "Score: " + score;
 }
 
-// CHECK ANSWER
-function checkAnswer(n){
+// =======================
+// ✅ CHECK ANSWER
+// =======================
+function check(n) {
 
-    if(n === QUESTIONS[i].c){
+    if (n === QUESTIONS[i].c) {
         score++;
     }
 
@@ -107,24 +130,31 @@ function checkAnswer(n){
     loadQuestion();
 }
 
-// END QUIZ
-function endQuiz(){
+// =======================
+// 🏁 END QUIZ
+// =======================
+function endQuiz() {
 
     clearInterval(timer);
 
     document.getElementById("question").innerText = "🎉 FIN DU QUIZ";
     document.getElementById("answers").innerHTML = "";
-
     document.getElementById("score").innerText = "Score final: " + score;
 
     // 💾 SAVE LOCAL RANKING
-    saveScore(score);
+    if (typeof saveScore === "function") {
+        saveScore(score);
+    }
 
-    // 📲 SEND TELEGRAM
-    sendToTelegram(score);
+    // 📲 TELEGRAM / API
+    if (typeof sendToTelegram === "function") {
+        sendToTelegram(score);
+    }
 }
 
-// START
+// =======================
+// 🚀 START
+// =======================
 loadQuestion();
 
 </script>
