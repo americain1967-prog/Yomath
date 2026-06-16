@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quiz Pro Ultimate</title>
+<title>Quiz Ultimate</title>
 
 <style>
 body{
@@ -11,16 +11,6 @@ body{
     color: white;
     text-align: center;
     margin: 0;
-}
-
-.header{
-    padding: 15px;
-    font-size: 22px;
-    font-weight: bold;
-}
-
-.box{
-    margin: 10px;
 }
 
 button{
@@ -36,70 +26,70 @@ button{
     color: orange;
     font-size: 18px;
 }
-
-#question{
-    font-size: 18px;
-    margin: 20px;
-}
 </style>
 </head>
 
 <body>
 
-<div class="header">🧠 Quiz Ultimate Startup</div>
+<h1>🧠 Quiz Ultimate</h1>
 
 <div id="timer">⏱ 30</div>
-<div class="box" id="score">Score: 0</div>
+<p id="score">Score: 0</p>
 
 <p id="question">Loading...</p>
 <div id="answers"></div>
 
-<!-- 🔥 MODULES (OBLIGATOIRE) -->
-<script src="app.js"></script>
-<script src="data.js"></script>
-<script src="api.js"></script>
-
 <script>
 
-// =======================
-// 🚀 QUIZ ENGINE ULTIME
-// =======================
+// =====================
+// 🔥 TOUT EN UN FICHIER
+// =====================
 
-let lang = localStorage.getItem("lang") || "fr";
 let i = 0;
 let score = 0;
 let time = 30;
 
-// 🔥 SECURITE DATA
-if (typeof QUESTIONS === "undefined") {
-    document.getElementById("question").innerText =
-        "❌ QUESTIONS NOT LOADED (check data.js)";
+// 🔥 QUESTIONS DIRECTEMENT ICI
+const QUESTIONS = [
+{
+q:{fr:"Capitale du Burkina Faso ?",en:"Capital of Burkina Faso?"},
+a:["Ouagadougou","Bobo","Accra","Paris"],
+c:0
+},
+{
+q:{fr:"2 + 2 = ?",en:"2 + 2 = ?"},
+a:["3","4","5","6"],
+c:1
+},
+{
+q:{fr:"HTML est un ?",en:"HTML is a ?"},
+a:["Langage","Animal","Voiture","Jeu"],
+c:0
 }
+];
 
-// =======================
+// 🔥 langue simple
+let lang = localStorage.getItem("lang") || "fr";
+
+// =====================
 // ⏱ TIMER
-// =======================
-let timer = setInterval(() => {
+// =====================
+let t = setInterval(()=>{
     time--;
     document.getElementById("timer").innerText = "⏱ " + time;
 
-    if (time <= 0) {
-        endQuiz();
+    if(time <= 0){
+        end();
     }
-}, 1000);
+},1000);
 
-// =======================
+// =====================
 // 📌 LOAD QUESTION
-// =======================
-function loadQuestion() {
+// =====================
+function load(){
 
-    if (!QUESTIONS || QUESTIONS.length === 0) {
-        document.getElementById("question").innerText = "❌ No questions found";
-        return;
-    }
-
-    if (i >= QUESTIONS.length) {
-        endQuiz();
+    if(i >= QUESTIONS.length){
+        end();
         return;
     }
 
@@ -109,53 +99,39 @@ function loadQuestion() {
 
     let html = "";
 
-    QUESTIONS[i].a.forEach((ans, idx) => {
-        html += `<button onclick="check(${idx})">${ans}</button>`;
+    QUESTIONS[i].a.forEach((a,idx)=>{
+        html += `<button onclick="check(${idx})">${a}</button>`;
     });
 
     document.getElementById("answers").innerHTML = html;
     document.getElementById("score").innerText = "Score: " + score;
 }
 
-// =======================
-// ✅ CHECK ANSWER
-// =======================
-function check(n) {
-
-    if (n === QUESTIONS[i].c) {
+// =====================
+// ✅ CHECK
+// =====================
+function check(n){
+    if(n === QUESTIONS[i].c){
         score++;
     }
 
     i++;
-    loadQuestion();
+    load();
 }
 
-// =======================
-// 🏁 END QUIZ
-// =======================
-function endQuiz() {
-
-    clearInterval(timer);
+// =====================
+// 🏁 END
+// =====================
+function end(){
+    clearInterval(t);
 
     document.getElementById("question").innerText = "🎉 FIN DU QUIZ";
     document.getElementById("answers").innerHTML = "";
     document.getElementById("score").innerText = "Score final: " + score;
-
-    // 💾 SAVE LOCAL RANKING
-    if (typeof saveScore === "function") {
-        saveScore(score);
-    }
-
-    // 📲 TELEGRAM / API
-    if (typeof sendToTelegram === "function") {
-        sendToTelegram(score);
-    }
 }
 
-// =======================
-// 🚀 START
-// =======================
-loadQuestion();
+// =====================
+load();
 
 </script>
 
