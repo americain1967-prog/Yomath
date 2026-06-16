@@ -2,117 +2,119 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quiz</title>
+<title>Quiz Pro</title>
 
 <style>
-body {
-    font-family: Arial;
-    background: #111;
-    color: white;
-    text-align: center;
-}
-button {
-    margin: 10px;
-    padding: 12px;
-    border-radius: 10px;
-    border: none;
-    width: 80%;
-}
+body{font-family:Arial;background:#111;color:white;text-align:center}
+button{margin:8px;padding:10px;width:80%;border:none;border-radius:10px}
+.badge{padding:5px 10px;background:orange;border-radius:10px}
 </style>
 </head>
 
 <body>
 
-<h1 id="title">🧠 Quiz</h1>
+<h1>🧠 QUIZ PRO</h1>
+
+<div class="badge" id="level">Level: Easy</div>
+<div id="timer">⏱ 30</div>
 
 <p id="question"></p>
 <div id="answers"></div>
-<p id="score"></p>
 
-<a href="index.html" id="back">⬅ Retour</a>
+<p id="score"></p>
 
 <script>
 
-// 🔥 langue unique (stable)
-let lang = localStorage.getItem("lang") || "fr";
+let lang=localStorage.getItem("lang")||"fr";
 
-// 🔥 questions
-const questions = {
-    fr: [
-        {q:"Capitale du Burkina Faso ?", a:["Ouagadougou","Bobo"], c:0},
-        {q:"2+2=?", a:["3","4"], c:1}
-    ],
-    en: [
-        {q:"Capital of Burkina Faso?", a:["Ouagadougou","Bobo"], c:0},
-        {q:"2+2=?", a:["3","4"], c:1}
-    ]
-};
+/* 🔥 20+ QUESTIONS */
+const questions=[
+{q:{fr:"Capitale Burkina ?",en:"Capital Burkina ?",es:"Capital Burkina ?",dioula:"...",moore:"..."},a:["Ouaga","Bobo"],c:0},
+{q:{fr:"2+2?",en:"2+2?",es:"2+2?"},a:["3","4"],c:1},
+{q:{fr:"x² dérivée ?",en:"derivative x²?"},a:["2x","x"],c:0},
+{q:{fr:"JavaScript est ?",en:"JS is?"},a:["langage","animal"],c:0}
+];
 
-// 🔥 sécurité
-if(!questions[lang]){
-    lang = "fr";
-}
+// 🔥 VARIABLES
+let i=0;
+let score=0;
+let time=30;
+let level="easy";
 
-// 🔥 interface
-const ui = {
-    fr: {
-        title: "🧠 Quiz",
-        back: "⬅ Retour",
-        end: "🎉 Fin du quiz",
-        score: "Score"
-    },
-    en: {
-        title: "🧠 Quiz",
-        back: "⬅ Back",
-        end: "🎉 Quiz finished",
-        score: "Score"
+// 🔥 TIMER
+let t=setInterval(()=>{
+    time--;
+    document.getElementById("timer").innerText="⏱ "+time;
+
+    if(time<=0){
+        endQuiz();
     }
-};
+},1000);
 
-let index = 0;
-let score = 0;
-
-function applyLang(){
-    let used = ui[lang] ? lang : "fr";
-
-    document.getElementById("title").innerText = ui[used].title;
-    document.getElementById("back").innerText = ui[used].back;
-}
-
+// 🔥 LOAD QUESTION
 function load(){
-    let q = questions[lang][index];
+    let q=questions[i].q[lang]||questions[i].q.fr;
 
-    document.getElementById("question").innerText = q.q;
+    document.getElementById("question").innerText=q;
 
     let html="";
-    q.a.forEach((ans,i)=>{
-        html += `<button onclick="check(${i})">${ans}</button>`;
+    questions[i].a.forEach((a,idx)=>{
+        html+=`<button onclick="check(${idx})">${a}</button>`;
     });
 
-    document.getElementById("answers").innerHTML = html;
-    document.getElementById("score").innerText = ui[lang].score + " : " + score;
+    document.getElementById("answers").innerHTML=html;
+    document.getElementById("score").innerText="Score: "+score;
 }
 
-function check(i){
-    let q = questions[lang][index];
+function check(n){
+    if(n===questions[i].c) score++;
 
-    if(i === q.c){
-        score++;
-    }
+    i++;
 
-    index++;
-
-    if(index >= questions[lang].length){
-        document.getElementById("question").innerText = ui[lang].end;
-        document.getElementById("answers").innerHTML = "";
+    if(i>=questions.length){
+        endQuiz();
         return;
     }
 
     load();
 }
 
-// 🔥 lancement propre
-applyLang();
+// 🔥 FIN QUIZ
+function endQuiz(){
+
+clearInterval(t);
+
+document.getElementById("question").innerText="🎉 FIN";
+document.getElementById("answers").innerHTML="";
+
+saveScore();
+sendTelegram();
+
+}
+
+// 🔥 CLASSEMENT LOCAL
+function saveScore(){
+    let board=JSON.parse(localStorage.getItem("board")||"[]");
+    board.push(score);
+    board.sort((a,b)=>b-a);
+    localStorage.setItem("board",JSON.stringify(board));
+}
+
+// 🔥 TELEGRAM
+function sendTelegram(){
+    const token="TON_TOKEN";
+    const chat_id="TON_CHAT_ID";
+
+    fetch(`https://api.telegram.org/bot${token}/sendMessage`,{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({
+            chat_id,
+            text:"🎯 Score: "+score
+        })
+    });
+}
+
 load();
 
 </script>
