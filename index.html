@@ -2,13 +2,13 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EduApp</title>
+<title>EduGlobal</title>
 
 <style>
 body{
     margin:0;
     font-family:Arial;
-    background:#0f172a;
+    background:#0b1220;
     color:white;
 }
 
@@ -16,19 +16,21 @@ body{
     padding:20px;
     font-size:24px;
     font-weight:bold;
+    text-align:center;
 }
 
 .langs{
     display:flex;
     justify-content:center;
-    gap:10px;
-    margin-bottom:20px;
+    gap:8px;
+    padding:10px;
 }
 
 button{
-    padding:8px 12px;
+    padding:6px 10px;
     border:none;
-    border-radius:8px;
+    border-radius:6px;
+    cursor:pointer;
 }
 
 .grid{
@@ -39,9 +41,9 @@ button{
 }
 
 .card{
-    background:#1e293b;
+    background:#1f2937;
     padding:20px;
-    border-radius:15px;
+    border-radius:12px;
     text-align:center;
     text-decoration:none;
     color:white;
@@ -51,7 +53,7 @@ button{
 
 <body>
 
-<div class="header" id="title">📚 EduApp</div>
+<div class="header" id="title">🌍 EduGlobal</div>
 
 <div class="langs">
 <button onclick="setLang('fr')">FR</button>
@@ -62,20 +64,20 @@ button{
 </div>
 
 <div class="grid">
-<a href="quiz.html" class="card">🧠 Quiz</a>
-<a href="classement.html" class="card">🏆 Ranking</a>
-<a href="#" class="card">📖 Cours</a>
-<a href="#" class="card">⚙ Settings</a>
+<a class="card" href="quiz.html">🧠 Quiz</a>
+<a class="card" href="ranking.html">🏆 Ranking</a>
+<a class="card" href="#">📚 Courses</a>
+<a class="card" href="#">⚙ Settings</a>
 </div>
 
 <script>
 
 const t={
-fr:{title:"📚 EduApp"},
-en:{title:"📚 EduApp"},
-es:{title:"📚 EduApp"},
-dioula:{title:"📚 Kalan App"},
-moore:{title:"📚 Koom App"}
+fr:{title:"🌍 EduGlobal"},
+en:{title:"🌍 EduGlobal"},
+es:{title:"🌍 EduGlobal"},
+dioula:{title:"🌍 Kalan Platform"},
+moore:{title:"🌍 Koom Platform"}
 };
 
 function setLang(l){
