@@ -2,62 +2,93 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Plateforme</title>
+<title>EduApp</title>
 
 <style>
 body{
+    margin:0;
     font-family:Arial;
-    background:linear-gradient(135deg,#1e3c72,#2a5298);
+    background:#0f172a;
     color:white;
-    text-align:center;
 }
-button{margin:5px;padding:8px}
-.card{
-    display:block;
-    margin:10px;
+
+.header{
+    padding:20px;
+    font-size:24px;
+    font-weight:bold;
+}
+
+.langs{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    margin-bottom:20px;
+}
+
+button{
+    padding:8px 12px;
+    border:none;
+    border-radius:8px;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
     padding:15px;
-    background:white;
-    color:black;
-    border-radius:10px;
+}
+
+.card{
+    background:#1e293b;
+    padding:20px;
+    border-radius:15px;
+    text-align:center;
     text-decoration:none;
+    color:white;
 }
 </style>
 </head>
 
 <body>
 
-<h1 id="title">📚 Plateforme</h1>
+<div class="header" id="title">📚 EduApp</div>
 
-<!-- LANGUES -->
+<div class="langs">
 <button onclick="setLang('fr')">FR</button>
 <button onclick="setLang('en')">EN</button>
 <button onclick="setLang('es')">ES</button>
 <button onclick="setLang('dioula')">DI</button>
 <button onclick="setLang('moore')">MO</button>
+</div>
 
-<a class="card" href="quiz.html">🧠 Quiz</a>
+<div class="grid">
+<a href="quiz.html" class="card">🧠 Quiz</a>
+<a href="classement.html" class="card">🏆 Ranking</a>
+<a href="#" class="card">📖 Cours</a>
+<a href="#" class="card">⚙ Settings</a>
+</div>
 
 <script>
 
-function setLang(l){
-    localStorage.setItem("lang",l);
-    applyLang();
-}
-
 const t={
-fr:{title:"📚 Plateforme"},
-en:{title:"📚 Platform"},
-es:{title:"📚 Plataforma"},
-dioula:{title:"📚 Kalan"},
-moore:{title:"📚 Koom"}
+fr:{title:"📚 EduApp"},
+en:{title:"📚 EduApp"},
+es:{title:"📚 EduApp"},
+dioula:{title:"📚 Kalan App"},
+moore:{title:"📚 Koom App"}
 };
 
-function applyLang(){
+function setLang(l){
+    localStorage.setItem("lang",l);
+    apply();
+}
+
+function apply(){
     let l=localStorage.getItem("lang")||"fr";
     document.getElementById("title").innerText=t[l]?.title||t.fr.title;
 }
 
-applyLang();
+apply();
 
 </script>
 
