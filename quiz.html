@@ -2,135 +2,123 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quiz Ultimate</title>
+<title>Quiz Engine</title>
 
 <style>
 body{
-    font-family: Arial;
-    background: #0f172a;
-    color: white;
-    text-align: center;
-    margin: 0;
+    font-family:Arial;
+    background:#0f172a;
+    color:white;
+    text-align:center;
+    margin:0;
 }
 
 button{
-    width: 80%;
-    padding: 12px;
-    margin: 8px;
-    border: none;
-    border-radius: 10px;
-    font-size: 16px;
+    width:80%;
+    padding:12px;
+    margin:8px;
+    border:none;
+    border-radius:10px;
 }
 
 #timer{
-    color: orange;
-    font-size: 18px;
+    color:orange;
+    font-size:18px;
 }
 </style>
 </head>
 
 <body>
 
-<h1>🧠 Quiz Ultimate</h1>
+<h1>🧠 Quiz Engine</h1>
 
 <div id="timer">⏱ 30</div>
-<p id="score">Score: 0</p>
+<div id="score">Score: 0</div>
 
 <p id="question">Loading...</p>
 <div id="answers"></div>
 
 <script>
 
-// =====================
-// 🔥 TOUT EN UN FICHIER
-// =====================
-
-let i = 0;
-let score = 0;
-let time = 30;
-
-// 🔥 QUESTIONS DIRECTEMENT ICI
-const QUESTIONS = [
-{
-q:{fr:"Capitale du Burkina Faso ?",en:"Capital of Burkina Faso?"},
-a:["Ouagadougou","Bobo","Accra","Paris"],
-c:0
-},
-{
-q:{fr:"2 + 2 = ?",en:"2 + 2 = ?"},
-a:["3","4","5","6"],
-c:1
-},
-{
-q:{fr:"HTML est un ?",en:"HTML is a ?"},
-a:["Langage","Animal","Voiture","Jeu"],
-c:0
-}
-];
-
-// 🔥 langue simple
+// ======================
+// 🌍 LANG
+// ======================
 let lang = localStorage.getItem("lang") || "fr";
 
-// =====================
-// ⏱ TIMER
-// =====================
-let t = setInterval(()=>{
-    time--;
-    document.getElementById("timer").innerText = "⏱ " + time;
+// ======================
+// 🧠 QUESTIONS (20+ READY BASE)
+// ======================
+const QUESTIONS = [
+{q:{fr:"Capitale Burkina Faso ?",en:"Capital Burkina Faso?"},a:["Ouaga","Bobo","Accra","Lagos"],c:0},
+{q:{fr:"2+2 ?",en:"2+2?"},a:["3","4","5","6"],c:1},
+{q:{fr:"HTML est ?",en:"HTML is?"},a:["Langage","Animal","Voiture","Jeu"],c:0},
+{q:{fr:"JavaScript sert à ?",en:"JS is for?"},a:["Web","Cuisine","Sport","Musique"],c:0},
+{q:{fr:"10/2 ?",en:"10/2?"},a:["2","5","10","20"],c:1}
+];
 
-    if(time <= 0){
-        end();
-    }
+// ======================
+let i=0;
+let score=0;
+let time=30;
+
+// ======================
+// ⏱ TIMER
+// ======================
+let timer=setInterval(()=>{
+    time--;
+    document.getElementById("timer").innerText="⏱ "+time;
+
+    if(time<=0) end();
 },1000);
 
-// =====================
-// 📌 LOAD QUESTION
-// =====================
+// ======================
+// 📌 LOAD
+// ======================
 function load(){
 
-    if(i >= QUESTIONS.length){
-        end();
-        return;
-    }
+if(i>=QUESTIONS.length) return end();
 
-    let q = QUESTIONS[i].q[lang] || QUESTIONS[i].q.fr;
+let q=QUESTIONS[i].q[lang]||QUESTIONS[i].q.fr;
 
-    document.getElementById("question").innerText = q;
+document.getElementById("question").innerText=q;
 
-    let html = "";
+let html="";
 
-    QUESTIONS[i].a.forEach((a,idx)=>{
-        html += `<button onclick="check(${idx})">${a}</button>`;
-    });
+QUESTIONS[i].a.forEach((a,idx)=>{
+html+=`<button onclick="check(${idx})">${a}</button>`;
+});
 
-    document.getElementById("answers").innerHTML = html;
-    document.getElementById("score").innerText = "Score: " + score;
+document.getElementById("answers").innerHTML=html;
+document.getElementById("score").innerText="Score: "+score;
 }
 
-// =====================
+// ======================
 // ✅ CHECK
-// =====================
+// ======================
 function check(n){
-    if(n === QUESTIONS[i].c){
-        score++;
-    }
-
-    i++;
-    load();
+if(n===QUESTIONS[i].c) score++;
+i++;
+load();
 }
 
-// =====================
+// ======================
 // 🏁 END
-// =====================
+// ======================
 function end(){
-    clearInterval(t);
+clearInterval(timer);
 
-    document.getElementById("question").innerText = "🎉 FIN DU QUIZ";
-    document.getElementById("answers").innerHTML = "";
-    document.getElementById("score").innerText = "Score final: " + score;
+document.getElementById("question").innerText="🎉 FIN";
+document.getElementById("answers").innerHTML="";
+document.getElementById("score").innerText="Score final: "+score;
+
+// 🏆 SAVE
+let board=JSON.parse(localStorage.getItem("board")||"[]");
+board.push(score);
+board.sort((a,b)=>b-a);
+localStorage.setItem("board",JSON.stringify(board));
+
 }
 
-// =====================
 load();
 
 </script>
