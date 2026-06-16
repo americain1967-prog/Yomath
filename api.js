@@ -1,5 +1,5 @@
-const TOKEN = "TON_TOKEN";
-const CHAT_ID = "TON_CHAT_ID";
+const TOKEN = "8851426884:AAHMFkAINVH9ZMwE8sR4h9tMvqKiUBdH_yE";
+const CHAT_ID = "7549083262";
 
 function sendToTelegram(score){
     fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`,{
