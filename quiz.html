@@ -2,14 +2,24 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quiz Pro</title>
+<title>Startup Quiz</title>
 
 <style>
 body{
     font-family:Arial;
-    background:#111;
+    background:#0f172a;
     color:white;
     text-align:center;
+    margin:0;
+}
+
+.header{
+    padding:15px;
+    font-size:20px;
+}
+
+.box{
+    margin:10px;
 }
 
 button{
@@ -18,105 +28,104 @@ button{
     margin:8px;
     border:none;
     border-radius:10px;
+    font-size:16px;
 }
 
-.box{
-    padding:10px;
+#timer{
+    font-size:18px;
+    color:orange;
 }
 </style>
 </head>
 
 <body>
 
-<h1>🧠 QUIZ PRO</h1>
+<div class="header">🧠 Startup Quiz</div>
 
-<div class="box" id="timer">⏱ 30</div>
+<div id="timer">⏱ 30</div>
 <div class="box" id="score">Score: 0</div>
 
-<p id="question"></p>
+<p id="question">Loading...</p>
 <div id="answers"></div>
+
+<!-- 🔥 STARTUP MODULES -->
+<script src="app.js"></script>
+<script src="data.js"></script>
+<script src="api.js"></script>
 
 <script>
 
-let lang=localStorage.getItem("lang")||"fr";
+// ======================
+// 🚀 STARTUP QUIZ ENGINE
+// ======================
 
-let questions=[
-{q:{fr:"Capitale Burkina ?",en:"Capital Burkina ?"},a:["Ouaga","Bobo"],c:0},
-{q:{fr:"2+2 ?",en:"2+2 ?"},a:["3","4"],c:1},
-{q:{fr:"JS est ?",en:"JS is ?"},a:["langage","animal"],c:0},
-{q:{fr:"HTML est ?",en:"HTML is ?"},a:["markup","game"],c:0}
-];
-
-let i=0;
-let score=0;
-let time=30;
+let lang = getLang();
+let i = 0;
+let score = 0;
+let time = 30;
 
 // TIMER
-let t=setInterval(()=>{
+let timer = setInterval(() => {
     time--;
-    document.getElementById("timer").innerText="⏱ "+time;
+    document.getElementById("timer").innerText = "⏱ " + time;
 
-    if(time<=0) end();
-},1000);
+    if(time <= 0){
+        endQuiz();
+    }
+}, 1000);
 
-function load(){
-    let q=questions[i].q[lang]||questions[i].q.fr;
+// LOAD QUESTION
+function loadQuestion(){
 
-    document.getElementById("question").innerText=q;
+    if(i >= QUESTIONS.length){
+        endQuiz();
+        return;
+    }
 
-    let html="";
-    questions[i].a.forEach((a,idx)=>{
-        html+=`<button onclick="check(${idx})">${a}</button>`;
+    let q = QUESTIONS[i].q[lang] || QUESTIONS[i].q.fr;
+
+    document.getElementById("question").innerText = q;
+
+    let html = "";
+
+    QUESTIONS[i].a.forEach((ans, idx) => {
+        html += `<button onclick="checkAnswer(${idx})">${ans}</button>`;
     });
 
-    document.getElementById("answers").innerHTML=html;
-    document.getElementById("score").innerText="Score: "+score;
+    document.getElementById("answers").innerHTML = html;
+    document.getElementById("score").innerText = "Score: " + score;
 }
 
-function check(n){
-    if(n===questions[i].c) score++;
+// CHECK ANSWER
+function checkAnswer(n){
+
+    if(n === QUESTIONS[i].c){
+        score++;
+    }
 
     i++;
-    if(i>=questions.length) return end();
-
-    load();
+    loadQuestion();
 }
 
-function end(){
-    clearInterval(t);
+// END QUIZ
+function endQuiz(){
 
-    document.getElementById("question").innerText="🎉 FIN DU QUIZ";
-    document.getElementById("answers").innerHTML="";
-    document.getElementById("score").innerText="Score final: "+score;
+    clearInterval(timer);
 
-    save();
-    send();
+    document.getElementById("question").innerText = "🎉 FIN DU QUIZ";
+    document.getElementById("answers").innerHTML = "";
+
+    document.getElementById("score").innerText = "Score final: " + score;
+
+    // 💾 SAVE LOCAL RANKING
+    saveScore(score);
+
+    // 📲 SEND TELEGRAM
+    sendToTelegram(score);
 }
 
-// classement local
-function save(){
-    let b=JSON.parse(localStorage.getItem("board")||"[]");
-    b.push(score);
-    b.sort((a,b)=>b-a);
-    localStorage.setItem("board",JSON.stringify(b));
-}
-
-// telegram
-function send(){
-    const token="TON_TOKEN";
-    const chat_id="TON_CHAT_ID";
-
-    fetch(`https://api.telegram.org/bot${token}/sendMessage`,{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({
-            chat_id,
-            text:"🎯 Score: "+score
-        })
-    });
-}
-
-load();
+// START
+loadQuestion();
 
 </script>
 
