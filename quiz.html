@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quiz Startup Clean</title>
+<title>Quiz Safe Startup</title>
 
 <style>
 body{
@@ -36,35 +36,7 @@ button{
 <script>
 
 // ======================
-// 🔥 FIREBASE INIT (SAFE)
-// ======================
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyBewu-Mse6_b7mHXiEUYUtBDipVWYLHrM4",
-  authDomain: "yomath-65f8f.firebaseapp.com",
-  projectId: "yomath-65f8f",
-  storageBucket: "yomath-65f8f.firebasestorage.app",
-  messagingSenderId: "19067457942",
-  appId: "1:19067457942:web:dd9e4363d5dee48b02cdb7",
-  measurementId: "G-JNZ6Q77FXT"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-
-// ======================
-// 🧠 QUESTIONS
+// 🧠 QUIZ (TOUJOURS SAFE)
 // ======================
 const QUESTIONS = [
 {q:"2+2=?",a:["3","4","5"],c:1},
@@ -72,11 +44,26 @@ const QUESTIONS = [
 {q:"10/2=?",a:["2","5","10"],c:1}
 ];
 
-// ======================
-// VARIABLES
-// ======================
 let i = 0;
 let score = 0;
+
+// ======================
+// 🔥 FIREBASE SAFE INIT
+// ======================
+let db = null;
+
+try {
+
+
+
+firebase.initializeApp(firebaseConfig);
+db = firebase.firestore();
+
+console.log("Firebase connecté ✔");
+
+} catch (e) {
+console.log("Firebase NON actif (quiz continue sans erreur)", e);
+}
 
 // ======================
 // LOAD QUIZ
@@ -101,20 +88,20 @@ document.getElementById("score").innerText = "Score: " + score;
 }
 
 // ======================
-// CHECK ANSWER (IMPORTANT)
+// CHECK
 // ======================
 function check(n){
 
 if(n === QUESTIONS[i].c){
-    score = score + 1;
+    score++;
 }
 
-i = i + 1;
+i++;
 load();
 }
 
 // ======================
-// END + FIREBASE SAVE
+// END QUIZ + SAFE FIREBASE
 // ======================
 function endQuiz(){
 
@@ -122,19 +109,20 @@ document.getElementById("question").innerText = "FIN 🎉";
 document.getElementById("answers").innerHTML = "";
 document.getElementById("score").innerText = "Score final: " + score;
 
-// 🔥 SAFE FIREBASE SAVE
-db.collection("ranking").add({
-    score: Number(score),
-    time: new Date().toString()
-}).then(()=>{
-    console.log("Score envoyé Firebase ✔");
-}).catch((e)=>{
-    console.log("Erreur Firebase ❌", e);
-});
+// 🔥 SAFE SAVE (NE CASSE PAS SI FIREBASE FAIL)
+if(db){
+    db.collection("ranking").add({
+        score: score,
+        time: new Date().toString()
+    }).then(()=>{
+        console.log("Score sauvegardé ✔");
+    }).catch((e)=>{
+        console.log("Firebase erreur mais quiz OK", e);
+    });
+}
 
 }
 
-// START
 load();
 
 </script>
