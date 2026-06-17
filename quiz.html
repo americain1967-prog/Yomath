@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quiz Stable</title>
+<title>Quiz + Firebase</title>
 
 <style>
 body{font-family:Arial;background:#0f172a;color:white;text-align:center;}
@@ -18,9 +18,27 @@ button{width:80%;padding:10px;margin:5px;}
 <p id="question"></p>
 <div id="answers"></div>
 
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
 <script>
 
-// 🧠 QUESTIONS ULTRA SIMPLES
+// 🔥 FIREBASE CONFIG (À REMPLACER)
+
+
+// INIT
+let db = null;
+
+try {
+    firebase.initializeApp(firebaseConfig);
+    db = firebase.firestore();
+    console.log("Firebase OK");
+} catch(e){
+    console.log("Firebase error", e);
+}
+
+// QUESTIONS
 const QUESTIONS = [
 {q:"2+2=?",a:["3","4","5"],c:1},
 {q:"Capitale BF?",a:["Ouaga","Paris","Accra"],c:0},
@@ -30,12 +48,11 @@ const QUESTIONS = [
 let i = 0;
 let score = 0;
 
-// 🚀 LOAD
+// LOAD
 function load(){
 
     if(i >= QUESTIONS.length){
-        document.getElementById("question").innerText = "FIN 🎉";
-        document.getElementById("answers").innerHTML = "";
+        end();
         return;
     }
 
@@ -50,7 +67,7 @@ function load(){
     document.getElementById("score").innerText = "Score: " + score;
 }
 
-// ✅ CHECK
+// CHECK
 function check(n){
 
     if(n === QUESTIONS[i].c){
@@ -59,6 +76,27 @@ function check(n){
 
     i++;
     load();
+}
+
+// END + FIREBASE
+function end(){
+
+    document.getElementById("question").innerText = "FIN 🎉";
+    document.getElementById("answers").innerHTML = "";
+
+    document.getElementById("score").innerText = "Score final: " + score;
+
+    // 🔥 ENVOI FIREBASE
+    if(db){
+        db.collection("scores").add({
+            score: score,
+            date: new Date().toString()
+        }).then(()=>{
+            console.log("Score envoyé");
+        }).catch((e)=>{
+            console.log("Erreur Firebase", e);
+        });
+    }
 }
 
 load();
