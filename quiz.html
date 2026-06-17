@@ -116,13 +116,18 @@ document.getElementById("score").innerText = "Score: " + score;
 // =====================
 function check(n){
 
-if(n === QUESTIONS[i].c){
-    score++;
+let correct = QUESTIONS[i].c;
+
+if(Number(n) === Number(correct)){
+    score = score + 1;
 }
 
 i++;
 load();
 }
+
+
+
 
 // =====================
 // END QUIZ
@@ -150,7 +155,7 @@ if(db){
 
 }
 
-load();
+load(){console.log("i=", i, "score=", score);}
 
 </script>
 
