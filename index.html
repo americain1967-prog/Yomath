@@ -1,96 +1,73 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EduGlobal</title>
-
+<title>Quiz Startup</title>
 <style>
-body{
-    margin:0;
-    font-family:Arial;
-    background:#0b1220;
-    color:white;
-}
-
-.header{
-    padding:20px;
-    font-size:24px;
-    font-weight:bold;
-    text-align:center;
-}
-
-.langs{
-    display:flex;
-    justify-content:center;
-    gap:8px;
-    padding:10px;
-}
-
-button{
-    padding:6px 10px;
-    border:none;
-    border-radius:6px;
-    cursor:pointer;
-}
-
-.grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:10px;
-    padding:15px;
-}
-
-.card{
-    background:#1f2937;
-    padding:20px;
-    border-radius:12px;
-    text-align:center;
-    text-decoration:none;
-    color:white;
-}
+body{font-family:Arial;background:#0f172a;color:white;text-align:center}
+button{width:80%;padding:10px;margin:5px}
+input{width:80%;padding:10px;margin:5px}
 </style>
 </head>
 
 <body>
 
-<div class="header" id="title">🌍 EduGlobal</div>
+<h2>🌍 Quiz Startup</h2>
 
-<div class="langs">
-<button onclick="setLang('fr')">FR</button>
-<button onclick="setLang('en')">EN</button>
-<button onclick="setLang('es')">ES</button>
-<button onclick="setLang('dioula')">DI</button>
-<button onclick="setLang('moore')">MO</button>
-</div>
+<input id="name" placeholder="Pseudo">
+<button onclick="start()">OK</button>
 
-<div class="grid">
-<a class="card" href="quiz.html">🧠 Quiz</a>
-<a class="card" href="ranking.html">🏆 Ranking</a>
-<a class="card" href="#">📚 Courses</a>
-<a class="card" href="#">⚙ Settings</a>
-</div>
+<div id="score">Score: 0</div>
+<p id="q"></p>
+<div id="a"></div>
 
 <script>
 
-const t={
-fr:{title:"🌍 EduGlobal"},
-en:{title:"🌍 EduGlobal"},
-es:{title:"🌍 EduGlobal"},
-dioula:{title:"🌍 Kalan Platform"},
-moore:{title:"🌍 Koom Platform"}
-};
+// 🧠 QUIZ
+const Q=[
+{q:"2+2",a:["3","4"],c:1},
+{q:"BF capitale",a:["Ouaga","Paris"],c:0}
+];
 
-function setLang(l){
-    localStorage.setItem("lang",l);
-    apply();
+let i=0;
+let score=0;
+let player="";
+
+function start(){
+player=document.getElementById("name").value;
+load();
 }
 
-function apply(){
-    let l=localStorage.getItem("lang")||"fr";
-    document.getElementById("title").innerText=t[l]?.title||t.fr.title;
+function load(){
+document.getElementById("q").innerText=Q[i].q;
+
+let html="";
+Q[i].a.forEach((x,n)=>{
+html+=`<button onclick="check(${n})">${x}</button>`;
+});
+
+document.getElementById("a").innerHTML=html;
+document.getElementById("score").innerText="Score: "+score;
 }
 
-apply();
+function check(n){
+if(n===Q[i].c) score++;
+i++;
+
+if(i>=Q.length){
+end();
+return;
+}
+
+load();
+}
+
+function end(){
+document.getElementById("q").innerText="FIN 🎉";
+document.getElementById("a").innerHTML="";
+document.getElementById("score").innerText="Score: "+score;
+}
+
+load();
 
 </script>
 
