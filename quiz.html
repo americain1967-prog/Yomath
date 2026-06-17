@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quiz Startup Offline</title>
+<title>Quiz Startup Global</title>
 
 <style>
 body{
@@ -15,24 +15,50 @@ body{
 button{
     width:80%;
     padding:10px;
-    margin:6px;
+    margin:5px;
     border-radius:10px;
+}
+
+input{
+    width:80%;
+    padding:10px;
+    margin:5px;
 }
 </style>
 </head>
 
 <body>
 
-<h2>Quiz Startup</h2>
+<h2>🌍 Quiz Startup Global</h2>
 
+<!-- PSEUDO -->
+<input id="name" placeholder="Ton pseudo">
+<button onclick="saveName()">Entrer</button>
+
+<p id="level">Niveau: 1</p>
 <div id="score">Score: 0</div>
+
 <p id="question"></p>
 <div id="answers"></div>
 
 <hr>
 
-<h3>🏆 Top local</h3>
+<h3>🏆 Classement mondial (local)</h3>
 <div id="ranking"></div>
+
+<hr>
+
+<h3>💬 Chat joueurs</h3>
+<div id="chatBox"></div>
+<input id="msg" placeholder="Message...">
+<button onclick="sendMsg()">Envoyer</button>
+
+<hr>
+
+<h3>🤖 IA Assistant (simulé)</h3>
+<input id="iaInput" placeholder="Pose une question">
+<button onclick="askIA()">Demander</button>
+<p id="iaAnswer"></p>
 
 <script>
 
@@ -42,14 +68,30 @@ button{
 const QUESTIONS = [
 {q:"2+2=?",a:["3","4","5"],c:1},
 {q:"BF capitale ?",a:["Ouaga","Paris","Accra"],c:0},
-{q:"10/2=?",a:["2","5","10"],c:1}
+{q:"10/2=?",a:["2","5","10"],c:1},
+{q:"HTML est ?",a:["Langage","Jeu","Voiture"],c:0}
 ];
 
 let i = 0;
 let score = 0;
+let player = "";
+let level = 1;
 
 // ======================
-// LOAD
+// PSEUDO
+// ======================
+function saveName(){
+player = document.getElementById("name").value;
+localStorage.setItem("player", player);
+}
+
+// ======================
+// LOAD PLAYER
+// ======================
+player = localStorage.getItem("player") || "";
+
+// ======================
+// LOAD QUIZ
 // ======================
 function load(){
 
@@ -66,8 +108,9 @@ html += `<button onclick="check(${idx})">${a}</button>`;
 });
 
 document.getElementById("answers").innerHTML = html;
-document.getElementById("score").innerText = "Score: " + score;
 
+document.getElementById("score").innerText = "Score: " + score;
+document.getElementById("level").innerText = "Niveau: " + level;
 }
 
 // ======================
@@ -76,31 +119,34 @@ document.getElementById("score").innerText = "Score: " + score;
 function check(n){
 
 if(n === QUESTIONS[i].c){
-    score++;
+score++;
 }
+
+// niveau automatique
+if(score >= 3) level = 2;
+if(score >= 5) level = 3;
 
 i++;
 load();
 }
 
 // ======================
-// END + CLASSEMENT LOCAL
+// END + CLASSEMENT
 // ======================
 function endQuiz(){
 
 document.getElementById("question").innerText = "FIN 🎉";
 document.getElementById("answers").innerHTML = "";
-document.getElementById("score").innerText = "Score final: " + score;
 
-// 🔥 SAVE LOCAL
+// classement local mondial
 let ranking = JSON.parse(localStorage.getItem("ranking") || "[]");
 
-ranking.push(score);
+ranking.push({
+name: player || "Anonyme",
+score: score
+});
 
-// tri décroissant
-ranking.sort((a,b)=>b-a);
-
-// garder top 5
+ranking.sort((a,b)=>b.score-a.score);
 ranking = ranking.slice(0,5);
 
 localStorage.setItem("ranking", JSON.stringify(ranking));
@@ -109,7 +155,7 @@ showRanking();
 }
 
 // ======================
-// AFFICHER CLASSEMENT
+// SHOW RANKING
 // ======================
 function showRanking(){
 
@@ -117,15 +163,68 @@ let ranking = JSON.parse(localStorage.getItem("ranking") || "[]");
 
 let html = "";
 
-ranking.forEach((s,i)=>{
-html += `<p>🏆 ${i+1}. ${s}</p>`;
+ranking.forEach((p,i)=>{
+html += `<p>🏆 ${i+1}. ${p.name} - ${p.score}</p>`;
 });
 
 document.getElementById("ranking").innerHTML = html;
 }
 
+// ======================
+// CHAT SIMPLE
+// ======================
+function sendMsg(){
+
+let msg = document.getElementById("msg").value;
+
+let chat = JSON.parse(localStorage.getItem("chat") || "[]");
+
+chat.push(player + ": " + msg);
+
+localStorage.setItem("chat", JSON.stringify(chat));
+
+showChat();
+}
+
+function showChat(){
+
+let chat = JSON.parse(localStorage.getItem("chat") || "[]");
+
+let html = "";
+
+chat.slice(-10).forEach(m=>{
+html += `<p>${m}</p>`;
+});
+
+document.getElementById("chatBox").innerHTML = html;
+}
+
+// ======================
+// IA SIMULÉE
+// ======================
+function askIA(){
+
+let q = document.getElementById("iaInput").value;
+
+let answer = "";
+
+if(q.includes("2+2")){
+answer = "2+2 = 4";
+}
+else if(q.includes("HTML")){
+answer = "HTML est un langage de structure web";
+}
+else{
+answer = "Je suis une IA simple, version future sera connectée à un vrai modèle.";
+}
+
+document.getElementById("iaAnswer").innerText = answer;
+}
+
+// INIT
 load();
 showRanking();
+showChat();
 
 </script>
 
