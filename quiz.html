@@ -2,57 +2,101 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quiz Test</title>
+<title>Quiz Firebase</title>
 
 <style>
-body{font-family:Arial;text-align:center;background:#0f172a;color:white;}
-button{margin:10px;padding:10px;width:80%;}
+body{
+    font-family:Arial;
+    background:#0f172a;
+    color:white;
+    text-align:center;
+}
+button{
+    width:80%;
+    padding:10px;
+    margin:6px;
+}
 </style>
 </head>
 
 <body>
 
-<h2>Quiz Test</h2>
+<h2>Quiz Firebase</h2>
 
 <div id="score">Score: 0</div>
 <p id="question">Chargement...</p>
 <div id="answers"></div>
 
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
 <script>
 
-// QUESTIONS
+// 🔥 CONFIG (REMPLACE ICI)
+
+
+// 🔥 INIT FIREBASE
+let db = null;
+
+try {
+    firebase.initializeApp(firebaseConfig);
+    db = firebase.firestore();
+} catch(e){
+    console.log("Firebase erreur", e);
+}
+
+// 🧠 QUESTIONS
 const QUESTIONS = [
 {q:"2+2=?",a:["3","4","5"],c:1},
-{q:"Capitale du Burkina Faso ?",a:["Ouaga","Paris","Accra"],c:0}
+{q:"Capitale BF?",a:["Ouaga","Paris","Accra"],c:0},
+{q:"10/2=?",a:["2","5","10"],c:1}
 ];
 
-let i=0;
-let score=0;
+let i = 0;
+let score = 0;
 
-// LOAD
+// 📌 LOAD
 function load(){
-if(i>=QUESTIONS.length){
-document.getElementById("question").innerText="FIN 🎉";
-document.getElementById("answers").innerHTML="";
-return;
+
+if(i >= QUESTIONS.length){
+    end();
+    return;
 }
 
-document.getElementById("question").innerText=QUESTIONS[i].q;
+document.getElementById("question").innerText = QUESTIONS[i].q;
 
-let html="";
+let html = "";
 QUESTIONS[i].a.forEach((a,idx)=>{
-html+=`<button onclick="check(${idx})">${a}</button>`;
+html += `<button onclick="check(${idx})">${a}</button>`;
 });
 
-document.getElementById("answers").innerHTML=html;
-document.getElementById("score").innerText="Score: "+score;
+document.getElementById("answers").innerHTML = html;
+document.getElementById("score").innerText = "Score: " + score;
+
 }
 
-// CHECK
+// ✅ CHECK
 function check(n){
-if(n===QUESTIONS[i].c) score++;
+if(n === QUESTIONS[i].c) score++;
 i++;
 load();
+}
+
+// 🏁 FIN
+function end(){
+
+document.getElementById("question").innerText = "FIN 🎉";
+document.getElementById("answers").innerHTML = "";
+
+// 🔥 ENVOI FIREBASE
+if(db){
+db.collection("scores").add({
+score: score,
+date: new Date().toString()
+});
+}
+
 }
 
 load();
