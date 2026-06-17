@@ -5,23 +5,9 @@
 <title>Quiz Mondial</title>
 
 <style>
-body{
-    font-family:Arial;
-    background:#0f172a;
-    color:white;
-    text-align:center;
-}
-button{
-    width:80%;
-    padding:10px;
-    margin:6px;
-    border-radius:10px;
-}
-input{
-    width:80%;
-    padding:10px;
-    margin:6px;
-}
+body{font-family:Arial;background:#0f172a;color:white;text-align:center;}
+button{width:80%;padding:10px;margin:6px;border-radius:10px;}
+input{width:80%;padding:10px;margin:6px;}
 </style>
 </head>
 
@@ -33,139 +19,112 @@ input{
 <button onclick="saveName()">Valider</button>
 
 <div id="score">Score: 0</div>
-
 <p id="question"></p>
 <div id="answers"></div>
 
 <hr>
 
-<h3>🏆 Classement mondial</h3>
+<h3>🏆 Classement</h3>
 <div id="ranking">Chargement...</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
 
-// ======================
-// 🔥 SUPABASE CONFIG
-// ======================
+// 🔥 SAFE INIT
+let supabase = null;
+
+try {
 const supabaseUrl = "https://matxsixoybtakfdmtqki.supabase.co";
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1hdHhzaXhveWJ0YWtmZG10cWtpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NDkyMjQsImV4cCI6MjA5NzIyNTIyNH0.8s30RmdK6D21FXL0PNGGc892mcmotxCEGDaL05zFjnk";
+const supabaseKey = "";
 
-const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+console.log("Supabase OK");
+} catch(e){
+console.log("Supabase erreur mais quiz OK");
+}
 
-// ======================
-// 🧠 QUESTIONS
-// ======================
+// QUESTIONS
 const QUESTIONS = [
 {q:"2+2=?",a:["3","4","5"],c:1},
-{q:"Capitale du Burkina Faso ?",a:["Ouaga","Paris","Accra"],c:0},
-{q:"10/2=?",a:["2","5","10"],c:1},
-{q:"HTML est ?",a:["Langage","Jeu","Voiture"],c:0},
-{q:"JS sert à ?",a:["Web","Cuisine","Sport"],c:0}
+{q:"Capitale BF ?",a:["Ouaga","Paris","Accra"],c:0},
+{q:"10/2=?",a:["2","5","10"],c:1}
 ];
 
 let i = 0;
 let score = 0;
 let player = "";
 
-// ======================
-// PSEUDO
-// ======================
+// NAME
 function saveName(){
 player = document.getElementById("name").value;
 }
 
-// ======================
-// LOAD QUIZ
-// ======================
+// LOAD
 function load(){
 
 if(i >= QUESTIONS.length){
-    endQuiz();
-    return;
+endQuiz();
+return;
 }
 
 document.getElementById("question").innerText = QUESTIONS[i].q;
 
-let html = "";
+let html="";
 QUESTIONS[i].a.forEach((a,idx)=>{
 html += `<button onclick="check(${idx})">${a}</button>`;
 });
 
 document.getElementById("answers").innerHTML = html;
-document.getElementById("score").innerText = "Score: " + score;
+document.getElementById("score").innerText = "Score: "+score;
 }
 
-// ======================
 // CHECK
-// ======================
 function check(n){
-
 if(n === QUESTIONS[i].c){
 score++;
 }
-
 i++;
 load();
 }
 
-// ======================
-// FIN QUIZ + ENVOI SUPABASE
-// ======================
+// END
 async function endQuiz(){
 
-document.getElementById("question").innerText = "🎉 FIN DU QUIZ";
+document.getElementById("question").innerText = "FIN 🎉";
 document.getElementById("answers").innerHTML = "";
-document.getElementById("score").innerText = "Score final: " + score;
 
-try {
-
-await supabase.from("ranking").insert([
-{
-name: player || "Anonyme",
-score: score
+if(supabase){
+try{
+await supabase.from("ranking").insert([{name:player||"Anonyme",score:score}]);
+} catch(e){
+console.log("Erreur envoi");
 }
-]);
-
-console.log("Score envoyé ✔");
-
-} catch (e) {
-console.log("Erreur Supabase ❌", e);
 }
 
-// recharge classement
 loadRanking();
 }
 
-// ======================
-// CLASSEMENT
-// ======================
+// RANKING
 async function loadRanking(){
 
-try {
+if(!supabase){
+document.getElementById("ranking").innerText="Pas connecté";
+return;
+}
 
-let { data } = await supabase
-.from("ranking")
-.select("*")
-.order("score", { ascending: false })
-.limit(5);
+try{
+let {data} = await supabase.from("ranking").select("*").limit(5);
 
-let html = "";
-
-if(data){
+let html="";
 data.forEach(p=>{
-html += `<p>🏆 ${p.name} - ${p.score}</p>`;
+html += `<p>${p.name} - ${p.score}</p>`;
 });
+
+document.getElementById("ranking").innerHTML = html;
+}catch(e){
+document.getElementById("ranking").innerText="Erreur";
 }
-
-document.getElementById("ranking").innerHTML = html || "Aucun score";
-
-} catch(e){
-document.getElementById("ranking").innerText = "Erreur chargement classement";
-console.log(e);
-}
-
 }
 
 // INIT
