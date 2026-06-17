@@ -1,73 +1,183 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Quiz Startup</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz Startup Mondial</title>
+
 <style>
-body{font-family:Arial;background:#0f172a;color:white;text-align:center}
-button{width:80%;padding:10px;margin:5px}
-input{width:80%;padding:10px;margin:5px}
+body{
+    font-family:Arial;
+    background:#0f172a;
+    color:white;
+    text-align:center;
+}
+
+button{
+    width:80%;
+    padding:10px;
+    margin:6px;
+    border-radius:10px;
+}
+
+input{
+    width:80%;
+    padding:10px;
+    margin:6px;
+}
 </style>
 </head>
 
 <body>
 
-<h2>🌍 Quiz Startup</h2>
+<h2>🌍 Quiz Startup Mondial</h2>
 
-<input id="name" placeholder="Pseudo">
+<input id="name" placeholder="Ton pseudo">
 <button onclick="start()">OK</button>
 
 <div id="score">Score: 0</div>
-<p id="q"></p>
-<div id="a"></div>
+
+<p id="question"></p>
+<div id="answers"></div>
+
+<hr>
+
+<h3>🏆 Classement mondial</h3>
+<div id="ranking">Chargement...</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
 
+// ======================
+// 🔥 SUPABASE SAFE INIT
+// ======================
+let supabase = null;
+
+const supabaseUrl = "https://matxsixoybtakfdmtqki.supabase.co";
+const supabaseKey = "";
+
+try {
+    supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+} catch(e){
+    console.log("Supabase offline mode");
+}
+
+// ======================
 // 🧠 QUIZ
-const Q=[
-{q:"2+2",a:["3","4"],c:1},
-{q:"BF capitale",a:["Ouaga","Paris"],c:0}
+// ======================
+const Q = [
+{q:"2+2 ?",a:["3","4","5"],c:1},
+{q:"Capitale BF ?",a:["Ouaga","Paris","Accra"],c:0},
+{q:"10/2 ?",a:["2","5","10"],c:1},
+{q:"HTML est ?",a:["Langage","Jeu","Voiture"],c:0}
 ];
 
-let i=0;
-let score=0;
-let player="";
+let i = 0;
+let score = 0;
+let player = "";
 
+// ======================
+// START
+// ======================
 function start(){
-player=document.getElementById("name").value;
+player = document.getElementById("name").value || "Anonyme";
 load();
 }
 
+// ======================
+// LOAD QUESTION
+// ======================
 function load(){
-document.getElementById("q").innerText=Q[i].q;
 
-let html="";
-Q[i].a.forEach((x,n)=>{
-html+=`<button onclick="check(${n})">${x}</button>`;
+document.getElementById("question").innerText = Q[i].q;
+
+let html = "";
+
+Q[i].a.forEach((a,idx)=>{
+html += `<button onclick="check(${idx})">${a}</button><br>`;
 });
 
-document.getElementById("a").innerHTML=html;
-document.getElementById("score").innerText="Score: "+score;
+document.getElementById("answers").innerHTML = html;
+document.getElementById("score").innerText = "Score: " + score;
 }
 
+// ======================
+// CHECK ANSWER
+// ======================
 function check(n){
-if(n===Q[i].c) score++;
+
+if(n === Q[i].c){
+score++;
+}
+
 i++;
 
-if(i>=Q.length){
+if(i >= Q.length){
 end();
+}else{
+load();
+}
+}
+
+// ======================
+// END QUIZ
+// ======================
+async function end(){
+
+document.getElementById("question").innerText = "🎉 FIN DU QUIZ";
+document.getElementById("answers").innerHTML = "";
+document.getElementById("score").innerText = "Score final: " + score;
+
+// 🔥 SAFE SAVE (NE CASSE JAMAIS LE QUIZ)
+if(supabase){
+try{
+await supabase.from("ranking").insert([
+{name: player, score: score}
+]);
+}catch(e){
+console.log("save failed but quiz ok");
+}
+}
+
+loadRanking();
+}
+
+// ======================
+// LOAD RANKING
+// ======================
+async function loadRanking(){
+
+if(!supabase){
+document.getElementById("ranking").innerText = "Mode offline";
 return;
 }
 
-load();
+try{
+
+let { data } = await supabase
+.from("ranking")
+.select("*")
+.order("score", { ascending: false })
+.limit(5);
+
+let html = "";
+
+if(data){
+data.forEach(p=>{
+html += `<p>🏆 ${p.name} - ${p.score}</p>`;
+});
 }
 
-function end(){
-document.getElementById("q").innerText="FIN 🎉";
-document.getElementById("a").innerHTML="";
-document.getElementById("score").innerText="Score: "+score;
+document.getElementById("ranking").innerHTML = html || "Aucun score";
+
+}catch(e){
+document.getElementById("ranking").innerText = "Erreur classement";
 }
 
-load();
+}
+
+// INIT
+loadRanking();
 
 </script>
 
