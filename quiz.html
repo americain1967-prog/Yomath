@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quiz Startup</title>
+<title>Quiz Startup Clean</title>
 
 <style>
 body{
@@ -18,35 +18,16 @@ button{
     margin:6px;
     border-radius:10px;
 }
-
-#score{
-    font-size:20px;
-    margin:10px;
-}
 </style>
 </head>
 
 <body>
 
-<h2 id="title">Quiz</h2>
+<h2>Quiz Startup</h2>
 
 <div id="score">Score: 0</div>
 <p id="question"></p>
 <div id="answers"></div>
-
-<!-- LANG -->
-<div>
-<button onclick="setLang('fr')">FR</button>
-<button onclick="setLang('en')">EN</button>
-<button onclick="setLang('es')">ES</button>
-</div>
-
-<hr>
-
-<h3>🏆 Top joueurs</h3>
-<div id="ranking"></div>
-
-<button onclick="resetQuiz()">Reset</button>
 
 <!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -55,53 +36,12 @@ button{
 <script>
 
 // ======================
-// 🔥 FIREBASE CONFIG
+// 🔥 FIREBASE INIT (SAFE)
 // ======================
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyBewu-Mse6_b7mHXiEUYUtBDipVWYLHrM4",
-  authDomain: "yomath-65f8f.firebaseapp.com",
-  projectId: "yomath-65f8f",
-  storageBucket: "yomath-65f8f.firebasestorage.app",
-  messagingSenderId: "19067457942",
-  appId: "1:19067457942:web:f3ddc16bdc7d9bcf02cdb7",
-  measurementId: "G-7DSY6QYM50"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
-
-// ======================
-// 🌍 LANG SYSTEM
-// ======================
-const LANG = {
-  fr:{title:"Quiz",score:"Score",finish:"Fin du quiz"},
-  en:{title:"Quiz",score:"Score",finish:"Quiz finished"},
-  es:{title:"Quiz",score:"Puntuación",finish:"Fin del quiz"}
-};
-
-let lang = localStorage.getItem("lang") || "fr";
-
-function t(k){
-  return LANG[lang][k];
-}
-
-function setLang(l){
-  lang = l;
-  localStorage.setItem("lang", l);
-  location.reload();
-}
 
 // ======================
 // 🧠 QUESTIONS
@@ -119,12 +59,12 @@ let i = 0;
 let score = 0;
 
 // ======================
-// LOAD
+// LOAD QUIZ
 // ======================
 function load(){
 
 if(i >= QUESTIONS.length){
-    end();
+    endQuiz();
     return;
 }
 
@@ -136,68 +76,46 @@ html += `<button onclick="check(${idx})">${a}</button>`;
 });
 
 document.getElementById("answers").innerHTML = html;
-document.getElementById("score").innerText = t("score") + ": " + score;
+document.getElementById("score").innerText = "Score: " + score;
+
 }
 
 // ======================
-// CHECK
+// CHECK ANSWER (IMPORTANT)
 // ======================
 function check(n){
 
 if(n === QUESTIONS[i].c){
-    score++;
+    score = score + 1;
 }
 
-i++;
+i = i + 1;
 load();
 }
 
 // ======================
-// END + FIREBASE
+// END + FIREBASE SAVE
 // ======================
-function end(){
+function endQuiz(){
 
-document.getElementById("question").innerText = t("finish");
+document.getElementById("question").innerText = "FIN 🎉";
 document.getElementById("answers").innerHTML = "";
+document.getElementById("score").innerText = "Score final: " + score;
 
-// 🔥 SAVE FIREBASE
+// 🔥 SAFE FIREBASE SAVE
 db.collection("ranking").add({
-    score: score,
-    lang: lang,
-    date: new Date().toString()
+    score: Number(score),
+    time: new Date().toString()
+}).then(()=>{
+    console.log("Score envoyé Firebase ✔");
+}).catch((e)=>{
+    console.log("Erreur Firebase ❌", e);
 });
 
-loadRanking();
 }
 
-// ======================
-// RANKING
-// ======================
-function loadRanking(){
-
-db.collection("ranking")
-.orderBy("score","desc")
-.limit(5)
-.get()
-.then(snap=>{
-let html="";
-snap.forEach(doc=>{
-html += `<p>⭐ ${doc.data().score}</p>`;
-});
-document.getElementById("ranking").innerHTML = html;
-});
-}
-
-// ======================
-// RESET
-// ======================
-function resetQuiz(){
-location.reload();
-}
-
-// INIT
+// START
 load();
-loadRanking();
 
 </script>
 
