@@ -90,12 +90,14 @@ function load(){
 // CHECK
 function check(n){
 
-    if(n === QUESTIONS[i].c){
-        score++;
-    }
+let correct = Number(QUESTIONS[i].c);
 
-    i++;
-    load();
+if(Number(n) === correct){
+    score = score + 1;
+}
+
+i = i + 1;
+load();
 }
 
 // END + FIREBASE
