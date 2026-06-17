@@ -2,41 +2,68 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quiz Stable</title>
+<title>Quiz Pro Stable</title>
 
 <style>
-body{font-family:Arial;background:#0f172a;color:white;text-align:center;}
-button{width:80%;padding:10px;margin:5px;border-radius:10px;}
+body{
+    font-family:Arial;
+    background:#0f172a;
+    color:white;
+    text-align:center;
+}
+
+button{
+    width:80%;
+    padding:10px;
+    margin:6px;
+    border-radius:10px;
+}
+
+#score{
+    font-size:20px;
+    margin-top:10px;
+}
 </style>
 </head>
 
 <body>
 
-<h2>Quiz Stable</h2>
+<h2>🌍 Quiz Pro</h2>
 
 <div id="score">Score: 0</div>
 <p id="question"></p>
 <div id="answers"></div>
+
+<button onclick="resetQuiz()">🔄 Reset Quiz</button>
 
 <script>
 
 // 🧠 QUESTIONS
 const QUESTIONS = [
 {q:"2+2=?",a:["3","4","5"],c:1},
-{q:"Capitale BF ?",a:["Ouaga","Paris","Accra"],c:0},
-{q:"10/2=?",a:["2","5","10"],c:1}
+{q:"Capitale Burkina Faso ?",a:["Ouaga","Paris","Accra"],c:0},
+{q:"10/2=?",a:["2","5","10"],c:1},
+{q:"HTML est ?",a:["Langage","Jeu","Voiture"],c:0},
+{q:"JS sert à ?",a:["Web","Cuisine","Sport"],c:0}
 ];
 
+// 🔥 VARIABLES
 let i = 0;
 let score = 0;
 
-// 🚀 LOAD
+// 🔥 LOAD SCORE SAUVEGARDÉ
+let saved = localStorage.getItem("score");
+if(saved !== null){
+    score = Number(saved);
+}
+
+// 🚀 LOAD QUESTION
 function load(){
 
 if(i >= QUESTIONS.length){
-document.getElementById("question").innerText = "FIN 🎉";
-document.getElementById("answers").innerHTML = "";
-return;
+    document.getElementById("question").innerText = "🎉 FIN DU QUIZ";
+    document.getElementById("answers").innerHTML = "";
+    return;
 }
 
 document.getElementById("question").innerText = QUESTIONS[i].q;
@@ -51,15 +78,24 @@ document.getElementById("score").innerText = "Score: " + score;
 
 }
 
-// ✅ CHECK
+// ✅ CHECK ANSWER
 function check(n){
 
 if(n === QUESTIONS[i].c){
-score++;
+    score++;
 }
+
+// 🔥 SAVE SCORE
+localStorage.setItem("score", score);
 
 i++;
 load();
+}
+
+// 🔄 RESET
+function resetQuiz(){
+localStorage.removeItem("score");
+location.reload();
 }
 
 load();
