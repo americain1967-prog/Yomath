@@ -90,10 +90,11 @@ function load(){
 // CHECK
 function check(n){
 
-let correct = Number(QUESTIONS[i].c);
+console.log("CLICK =", n, "GOOD =", QUESTIONS[i].c);
 
-if(Number(n) === correct){
+if(Number(n) === Number(QUESTIONS[i].c)){
     score = score + 1;
+    console.log("BONNE REP ✔ score =", score);
 }
 
 i = i + 1;
