@@ -2,70 +2,40 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quiz Stable</title>
-
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<title>Quiz Test</title>
 
 <style>
-body{font-family:Arial;background:#0f172a;color:white;text-align:center;}
-button{width:80%;padding:10px;margin:5px;border-radius:10px;}
+body{font-family:Arial;text-align:center;background:#0f172a;color:white;}
+button{margin:10px;padding:10px;width:80%;}
 </style>
 </head>
 
 <body>
 
-<h2>Quiz</h2>
+<h2>Quiz Test</h2>
 
-<div id="score"></div>
+<div id="score">Score: 0</div>
 <p id="question">Chargement...</p>
 <div id="answers"></div>
 
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-
 <script>
 
-// 🔥 CONFIG
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyBewu-Mse6_b7mHXiEUYUtBDipVWYLHrM4",
-  authDomain: "yomath-65f8f.firebaseapp.com",
-  projectId: "yomath-65f8f",
-  storageBucket: "yomath-65f8f.firebasestorage.app",
-  messagingSenderId: "19067457942",
-  appId: "1:19067457942:web:f3ddc16bdc7d9bcf02cdb7",
-  measurementId: "G-7DSY6QYM50"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-
-
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-
-// 🔥 QUESTIONS
+// QUESTIONS
 const QUESTIONS = [
 {q:"2+2=?",a:["3","4","5"],c:1},
-{q:"Capitale BF?",a:["Ouaga","Paris","Accra"],c:0}
+{q:"Capitale du Burkina Faso ?",a:["Ouaga","Paris","Accra"],c:0}
 ];
 
-// 🔥 STATE SAUVEGARDÉ
-let i = Number(localStorage.getItem("i")) || 0;
-let score = Number(localStorage.getItem("score")) || 0;
+let i=0;
+let score=0;
 
-// 🔥 LOAD
+// LOAD
 function load(){
-
-if(i>=QUESTIONS.length){end();return;}
+if(i>=QUESTIONS.length){
+document.getElementById("question").innerText="FIN 🎉";
+document.getElementById("answers").innerHTML="";
+return;
+}
 
 document.getElementById("question").innerText=QUESTIONS[i].q;
 
@@ -76,34 +46,13 @@ html+=`<button onclick="check(${idx})">${a}</button>`;
 
 document.getElementById("answers").innerHTML=html;
 document.getElementById("score").innerText="Score: "+score;
-
-// sauvegarde
-localStorage.setItem("i", i);
-localStorage.setItem("score", score);
 }
 
-// 🔥 CHECK
+// CHECK
 function check(n){
 if(n===QUESTIONS[i].c) score++;
 i++;
 load();
-}
-
-// 🔥 FIN
-function end(){
-
-document.getElementById("question").innerText="FIN 🎉";
-document.getElementById("answers").innerHTML="";
-
-localStorage.removeItem("i");
-localStorage.removeItem("score");
-
-// 🔥 FIREBASE
-db.collection("scores").add({
-score: score,
-date: new Date().toString(),
-lang: "fr"
-});
 }
 
 load();
