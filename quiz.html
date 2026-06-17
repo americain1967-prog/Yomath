@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quiz Pro Stable</title>
+<title>Quiz Startup</title>
 
 <style>
 body{
@@ -21,48 +21,90 @@ button{
 
 #score{
     font-size:20px;
-    margin-top:10px;
+    margin:10px;
 }
 </style>
 </head>
 
 <body>
 
-<h2>🌍 Quiz Pro</h2>
+<h2 id="title">Quiz</h2>
 
 <div id="score">Score: 0</div>
 <p id="question"></p>
 <div id="answers"></div>
 
-<button onclick="resetQuiz()">🔄 Reset Quiz</button>
+<!-- LANG -->
+<div>
+<button onclick="setLang('fr')">FR</button>
+<button onclick="setLang('en')">EN</button>
+<button onclick="setLang('es')">ES</button>
+</div>
+
+<hr>
+
+<h3>🏆 Top joueurs</h3>
+<div id="ranking"></div>
+
+<button onclick="resetQuiz()">Reset</button>
+
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
 <script>
 
+// ======================
+// 🔥 FIREBASE CONFIG
+// ======================
+
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// ======================
+// 🌍 LANG SYSTEM
+// ======================
+const LANG = {
+  fr:{title:"Quiz",score:"Score",finish:"Fin du quiz"},
+  en:{title:"Quiz",score:"Score",finish:"Quiz finished"},
+  es:{title:"Quiz",score:"Puntuación",finish:"Fin del quiz"}
+};
+
+let lang = localStorage.getItem("lang") || "fr";
+
+function t(k){
+  return LANG[lang][k];
+}
+
+function setLang(l){
+  lang = l;
+  localStorage.setItem("lang", l);
+  location.reload();
+}
+
+// ======================
 // 🧠 QUESTIONS
+// ======================
 const QUESTIONS = [
 {q:"2+2=?",a:["3","4","5"],c:1},
-{q:"Capitale Burkina Faso ?",a:["Ouaga","Paris","Accra"],c:0},
-{q:"10/2=?",a:["2","5","10"],c:1},
-{q:"HTML est ?",a:["Langage","Jeu","Voiture"],c:0},
-{q:"JS sert à ?",a:["Web","Cuisine","Sport"],c:0}
+{q:"BF capitale ?",a:["Ouaga","Paris","Accra"],c:0},
+{q:"10/2=?",a:["2","5","10"],c:1}
 ];
 
-// 🔥 VARIABLES
+// ======================
+// VARIABLES
+// ======================
 let i = 0;
 let score = 0;
 
-// 🔥 LOAD SCORE SAUVEGARDÉ
-let saved = localStorage.getItem("score");
-if(saved !== null){
-    score = Number(saved);
-}
-
-// 🚀 LOAD QUESTION
+// ======================
+// LOAD
+// ======================
 function load(){
 
 if(i >= QUESTIONS.length){
-    document.getElementById("question").innerText = "🎉 FIN DU QUIZ";
-    document.getElementById("answers").innerHTML = "";
+    end();
     return;
 }
 
@@ -74,31 +116,68 @@ html += `<button onclick="check(${idx})">${a}</button>`;
 });
 
 document.getElementById("answers").innerHTML = html;
-document.getElementById("score").innerText = "Score: " + score;
-
+document.getElementById("score").innerText = t("score") + ": " + score;
 }
 
-// ✅ CHECK ANSWER
+// ======================
+// CHECK
+// ======================
 function check(n){
 
 if(n === QUESTIONS[i].c){
     score++;
 }
 
-// 🔥 SAVE SCORE
-localStorage.setItem("score", score);
-
 i++;
 load();
 }
 
-// 🔄 RESET
+// ======================
+// END + FIREBASE
+// ======================
+function end(){
+
+document.getElementById("question").innerText = t("finish");
+document.getElementById("answers").innerHTML = "";
+
+// 🔥 SAVE FIREBASE
+db.collection("ranking").add({
+    score: score,
+    lang: lang,
+    date: new Date().toString()
+});
+
+loadRanking();
+}
+
+// ======================
+// RANKING
+// ======================
+function loadRanking(){
+
+db.collection("ranking")
+.orderBy("score","desc")
+.limit(5)
+.get()
+.then(snap=>{
+let html="";
+snap.forEach(doc=>{
+html += `<p>⭐ ${doc.data().score}</p>`;
+});
+document.getElementById("ranking").innerHTML = html;
+});
+}
+
+// ======================
+// RESET
+// ======================
 function resetQuiz(){
-localStorage.removeItem("score");
 location.reload();
 }
 
+// INIT
 load();
+loadRanking();
 
 </script>
 
