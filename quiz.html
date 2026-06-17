@@ -2,82 +2,119 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quiz Simple</title>
+<title>Quiz Startup</title>
 </head>
 
 <body style="font-family:Arial;text-align:center;background:#0f172a;color:white">
 
-<h2>🌍 Quiz</h2>
+<h2>🌍 Quiz Startup</h2>
+
+<input id="name" placeholder="Ton pseudo">
+<br><br>
+
+<button onclick="startGame()">Démarrer</button>
 
 <div id="score">Score: 0</div>
 
 <p id="question"></p>
 <div id="answers"></div>
 
+<hr>
+
+<h3>🏆 Classement local</h3>
+<div id="ranking"></div>
+
 <script>
 
 // 🧠 QUESTIONS
 const questions = [
-  {
-    q: "2 + 2 = ?",
-    a: ["3", "4", "5"],
-    c: 1
-  },
-  {
-    q: "Capitale du Burkina Faso ?",
-    a: ["Ouagadougou", "Bamako", "Dakar"],
-    c: 0
-  },
-  {
-    q: "10 / 2 = ?",
-    a: ["2", "5", "10"],
-    c: 1
-  }
+{q:"2 + 2 = ?",a:["3","4","5"],c:1},
+{q:"Capitale BF ?",a:["Ouaga","Paris","Dakar"],c:0},
+{q:"10 / 2 = ?",a:["2","5","10"],c:1}
 ];
 
 let i = 0;
 let score = 0;
+let player = "";
 
-// 📥 CHARGER QUESTION
-function loadQuestion() {
-
-  document.getElementById("question").innerText = questions[i].q;
-
-  let html = "";
-
-  questions[i].a.forEach((answer, index) => {
-    html += `<button onclick="checkAnswer(${index})">${answer}</button><br><br>`;
-  });
-
-  document.getElementById("answers").innerHTML = html;
-  document.getElementById("score").innerText = "Score: " + score;
-}
-
-// ✅ CHECK REPONSE
-function checkAnswer(index) {
-
-  if (index === questions[i].c) {
-    score++;
-  }
-
-  i++;
-
-  if (i >= questions.length) {
-    endQuiz();
-  } else {
-    loadQuestion();
-  }
-}
-
-// 🏁 FIN QUIZ
-function endQuiz() {
-  document.getElementById("question").innerText = "🎉 Quiz terminé !";
-  document.getElementById("answers").innerHTML = "";
-  document.getElementById("score").innerText = "Score final: " + score;
-}
-
-// START
+// 🚀 START
+function startGame(){
+player = document.getElementById("name").value || "Anonyme";
 loadQuestion();
+}
+
+// 📥 LOAD
+function loadQuestion(){
+
+document.getElementById("question").innerText = questions[i].q;
+
+let html = "";
+
+questions[i].a.forEach((a,idx)=>{
+html += `<button onclick="check(${idx})">${a}</button><br><br>`;
+});
+
+document.getElementById("answers").innerHTML = html;
+document.getElementById("score").innerText = "Score: " + score;
+}
+
+// ✅ CHECK
+function check(index){
+
+if(index === questions[i].c){
+score++;
+}
+
+i++;
+
+if(i >= questions.length){
+endGame();
+}else{
+loadQuestion();
+}
+}
+
+// 🏁 FIN
+function endGame(){
+
+document.getElementById("question").innerText = "🎉 FIN DU QUIZ";
+document.getElementById("answers").innerHTML = "";
+
+// 🔥 sauvegarde locale
+let ranking = JSON.parse(localStorage.getItem("ranking") || "[]");
+
+ranking.push({
+name: player,
+score: score
+});
+
+// tri
+ranking.sort((a,b)=>b.score-a.score);
+
+// top 5
+ranking = ranking.slice(0,5);
+
+localStorage.setItem("ranking", JSON.stringify(ranking));
+
+showRanking();
+}
+
+// 🏆 AFFICHAGE CLASSEMENT
+function showRanking(){
+
+let ranking = JSON.parse(localStorage.getItem("ranking") || "[]");
+
+let html = "";
+
+ranking.forEach((p,i)=>{
+html += `<p>🏆 ${i+1}. ${p.name} - ${p.score}</p>`;
+});
+
+document.getElementById("ranking").innerHTML = html;
+}
+
+// init classement
+showRanking();
 
 </script>
 
