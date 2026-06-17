@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quiz Startup Global</title>
+<title>Quiz Mondial</title>
 
 <style>
 body{
@@ -11,31 +11,27 @@ body{
     color:white;
     text-align:center;
 }
-
 button{
     width:80%;
     padding:10px;
-    margin:5px;
+    margin:6px;
     border-radius:10px;
 }
-
 input{
     width:80%;
     padding:10px;
-    margin:5px;
+    margin:6px;
 }
 </style>
 </head>
 
 <body>
 
-<h2>🌍 Quiz Startup Global</h2>
+<h2>🌍 Quiz Mondial</h2>
 
-<!-- PSEUDO -->
 <input id="name" placeholder="Ton pseudo">
-<button onclick="saveName()">Entrer</button>
+<button onclick="saveName()">Valider</button>
 
-<p id="level">Niveau: 1</p>
 <div id="score">Score: 0</div>
 
 <p id="question"></p>
@@ -43,52 +39,42 @@ input{
 
 <hr>
 
-<h3>🏆 Classement mondial (local)</h3>
-<div id="ranking"></div>
+<h3>🏆 Classement mondial</h3>
+<div id="ranking">Chargement...</div>
 
-<hr>
-
-<h3>💬 Chat joueurs</h3>
-<div id="chatBox"></div>
-<input id="msg" placeholder="Message...">
-<button onclick="sendMsg()">Envoyer</button>
-
-<hr>
-
-<h3>🤖 IA Assistant (simulé)</h3>
-<input id="iaInput" placeholder="Pose une question">
-<button onclick="askIA()">Demander</button>
-<p id="iaAnswer"></p>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
+
+// ======================
+// 🔥 SUPABASE CONFIG
+// ======================
+const supabaseUrl = "https://matxsixoybtakfdmtqki.supabase.co";
+const supabaseKey = "";
+
+const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
 // ======================
 // 🧠 QUESTIONS
 // ======================
 const QUESTIONS = [
 {q:"2+2=?",a:["3","4","5"],c:1},
-{q:"BF capitale ?",a:["Ouaga","Paris","Accra"],c:0},
+{q:"Capitale du Burkina Faso ?",a:["Ouaga","Paris","Accra"],c:0},
 {q:"10/2=?",a:["2","5","10"],c:1},
-{q:"HTML est ?",a:["Langage","Jeu","Voiture"],c:0}
+{q:"HTML est ?",a:["Langage","Jeu","Voiture"],c:0},
+{q:"JS sert à ?",a:["Web","Cuisine","Sport"],c:0}
 ];
 
 let i = 0;
 let score = 0;
 let player = "";
-let level = 1;
 
 // ======================
 // PSEUDO
 // ======================
 function saveName(){
 player = document.getElementById("name").value;
-localStorage.setItem("player", player);
 }
-
-// ======================
-// LOAD PLAYER
-// ======================
-player = localStorage.getItem("player") || "";
 
 // ======================
 // LOAD QUIZ
@@ -108,9 +94,7 @@ html += `<button onclick="check(${idx})">${a}</button>`;
 });
 
 document.getElementById("answers").innerHTML = html;
-
 document.getElementById("score").innerText = "Score: " + score;
-document.getElementById("level").innerText = "Niveau: " + level;
 }
 
 // ======================
@@ -122,109 +106,71 @@ if(n === QUESTIONS[i].c){
 score++;
 }
 
-// niveau automatique
-if(score >= 3) level = 2;
-if(score >= 5) level = 3;
-
 i++;
 load();
 }
 
 // ======================
-// END + CLASSEMENT
+// FIN QUIZ + ENVOI SUPABASE
 // ======================
-function endQuiz(){
+async function endQuiz(){
 
-document.getElementById("question").innerText = "FIN 🎉";
+document.getElementById("question").innerText = "🎉 FIN DU QUIZ";
 document.getElementById("answers").innerHTML = "";
+document.getElementById("score").innerText = "Score final: " + score;
 
-// classement local mondial
-let ranking = JSON.parse(localStorage.getItem("ranking") || "[]");
+try {
 
-ranking.push({
+await supabase.from("ranking").insert([
+{
 name: player || "Anonyme",
 score: score
-});
+}
+]);
 
-ranking.sort((a,b)=>b.score-a.score);
-ranking = ranking.slice(0,5);
+console.log("Score envoyé ✔");
 
-localStorage.setItem("ranking", JSON.stringify(ranking));
+} catch (e) {
+console.log("Erreur Supabase ❌", e);
+}
 
-showRanking();
+// recharge classement
+loadRanking();
 }
 
 // ======================
-// SHOW RANKING
+// CLASSEMENT
 // ======================
-function showRanking(){
+async function loadRanking(){
 
-let ranking = JSON.parse(localStorage.getItem("ranking") || "[]");
+try {
+
+let { data } = await supabase
+.from("ranking")
+.select("*")
+.order("score", { ascending: false })
+.limit(5);
 
 let html = "";
 
-ranking.forEach((p,i)=>{
-html += `<p>🏆 ${i+1}. ${p.name} - ${p.score}</p>`;
+if(data){
+data.forEach(p=>{
+html += `<p>🏆 ${p.name} - ${p.score}</p>`;
 });
-
-document.getElementById("ranking").innerHTML = html;
 }
 
-// ======================
-// CHAT SIMPLE
-// ======================
-function sendMsg(){
+document.getElementById("ranking").innerHTML = html || "Aucun score";
 
-let msg = document.getElementById("msg").value;
-
-let chat = JSON.parse(localStorage.getItem("chat") || "[]");
-
-chat.push(player + ": " + msg);
-
-localStorage.setItem("chat", JSON.stringify(chat));
-
-showChat();
+} catch(e){
+document.getElementById("ranking").innerText = "Erreur chargement classement";
+console.log(e);
 }
 
-function showChat(){
-
-let chat = JSON.parse(localStorage.getItem("chat") || "[]");
-
-let html = "";
-
-chat.slice(-10).forEach(m=>{
-html += `<p>${m}</p>`;
-});
-
-document.getElementById("chatBox").innerHTML = html;
-}
-
-// ======================
-// IA SIMULÉE
-// ======================
-function askIA(){
-
-let q = document.getElementById("iaInput").value;
-
-let answer = "";
-
-if(q.includes("2+2")){
-answer = "2+2 = 4";
-}
-else if(q.includes("HTML")){
-answer = "HTML est un langage de structure web";
-}
-else{
-answer = "Je suis une IA simple, version future sera connectée à un vrai modèle.";
-}
-
-document.getElementById("iaAnswer").innerText = answer;
 }
 
 // INIT
 load();
-showRanking();
-showChat();
+loadRanking();
 
 </script>
 
