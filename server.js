@@ -1,86 +1,51 @@
-const WebSocket = require("ws");
+const express = require("express");
+const http = require("http");
+const { Server } = require("socket.io");
+const cors = require("cors");
 
-const wss = new WebSocket.Server({ port: 3000 });
+const app = express();
+app.use(cors());
 
-let rooms = {};
-
-wss.on("connection", (ws) => {
-
-    ws.on("message", (message) => {
-
-        let data = JSON.parse(message);
-
-        // JOIN ROOM
-        if(data.type === "join"){
-
-            ws.username = data.name;
-            ws.room = data.room;
-
-            if(!rooms[data.room]) rooms[data.room] = [];
-
-            rooms[data.room].push(ws);
-
-            broadcastRoom(data.room, {
-                type:"system",
-                msg:`${data.name} a rejoint la salle`
-            });
-        }
-
-        // CHAT MESSAGE
-        if(data.type === "chat"){
-
-            broadcastRoom(ws.room, {
-                type:"chat",
-                name: ws.username,
-                msg: data.msg
-            });
-        }
-
-        // MATCHMAKING
-        if(data.type === "match"){
-
-            let room = findAvailableRoom();
-
-            ws.send(JSON.stringify({
-                type:"match_found",
-                room
-            }));
-        }
-    });
-
-    ws.on("close", () => {
-        removeUser(ws);
-    });
+const server = http.createServer(app);
+const io = new Server(server, {
+cors: { origin: "*" }
 });
 
-// BROADCAST ROOM
-function broadcastRoom(room, data){
+// 🌍 CHAT MONDIAL
+io.on("connection", (socket) => {
 
-    if(!rooms[room]) return;
+console.log("User connected:", socket.id);
 
-    rooms[room].forEach(client => {
-        if(client.readyState === 1){
-            client.send(JSON.stringify(data));
-        }
-    });
-}
+// 💬 CHAT GLOBAL
+socket.on("chat", (data) => {
+io.emit("chat", data);
+});
 
-// MATCHMAKING SIMPLE
-function findAvailableRoom(){
+// ⚔️ DUEL
+socket.on("duel", (data) => {
+io.emit("duel", data);
+});
 
-    let roomName = "room_" + Math.floor(Math.random()*1000);
+// 🏆 SCORE GLOBAL
+socket.on("score", (data) => {
+io.emit("score", data);
+});
 
-    rooms[roomName] = [];
+// 🤖 IA QUESTION GENERATOR
+socket.on("ai_question", (data) => {
+let questions = [
+"2 + 2 = ?",
+"5 x 3 = ?",
+"Physique: unité énergie ?"
+];
 
-    return roomName;
-}
+let q = questions[Math.floor(Math.random()*questions.length)];
 
-// CLEAN
-function removeUser(ws){
+socket.emit("ai_response", q);
+});
 
-    if(!ws.room) return;
+});
 
-    rooms[ws.room] = (rooms[ws.room] || []).filter(c => c !== ws);
-}
-
-console.log("🚀 WebSocket server running on ws://localhost:3000");
+server.listen(3000, () => {
+console.log("Server running on port 3000");
+});
