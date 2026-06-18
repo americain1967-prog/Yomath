@@ -2,25 +2,19 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Plateforme Scolaire</title>
+<title>School AI Platform</title>
 </head>
 
 <body style="font-family:Arial;text-align:center;background:#0f172a;color:white">
 
-<h1>🎓 Plateforme Scolaire</h1>
+<h1>🎓 School AI Platform</h1>
 
 <input id="name" placeholder="Nom"><br><br>
 
 <select id="classe">
-<option>6e</option>
-<option>5e</option>
-<option>4e</option>
-<option>3e</option>
-<option>2nde</option>
-<option>1ère C</option>
-<option>1ère D</option>
-<option>Terminale C</option>
-<option>Terminale D</option>
+<option>6e</option><option>5e</option><option>4e</option><option>3e</option>
+<option>2nde</option><option>1ère C</option><option>1ère D</option>
+<option>Terminale C</option><option>Terminale D</option>
 </select><br><br>
 
 <select id="matiere">
@@ -29,10 +23,14 @@
 <option value="svt">SVT</option>
 </select><br><br>
 
-<h3>📚 Choisir</h3>
+<h3>📚 Menu</h3>
 
+<button onclick="go('cours.html')">📖 Cours</button>
+<button onclick="go('devoir.html')">📝 Devoirs</button>
 <button onclick="go('quiz.html')">🎮 Quiz</button>
-<button onclick="go('correction.html')">✅ Correction</button>
+<button onclick="go('classement.html')">🏆 Classement</button>
+<button onclick="go('duel.html')">⚔️ Duel</button>
+<button onclick="go('badges.html')">🎖️ Badges</button>
 
 <script>
 
