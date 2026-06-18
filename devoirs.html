@@ -2,25 +2,40 @@
 <html>
 <body style="background:#0f172a;color:white;text-align:center">
 
-<h2>📝 Devoir</h2>
+<h2>📝 Devoir Chrono</h2>
 
-<p>2 + 3 = ?</p>
+<p id="q">2 + 3 = ?</p>
 
-<input id="rep">
+<input id="r">
 <button onclick="check()">Valider</button>
 
+<p id="t"></p>
 <p id="res"></p>
 
 <script>
+
+let start = Date.now();
+
+let errors = JSON.parse(localStorage.getItem("errors")||"[]");
+
 function check(){
-let r = document.getElementById("rep").value;
+
+let time = (Date.now()-start)/1000;
+let r = document.getElementById("r").value;
 
 if(r == 5){
-document.getElementById("res").innerText = "✅ Correct";
+document.getElementById("res").innerText="✅ Bon";
 }else{
-document.getElementById("res").innerText = "❌ Faux";
+document.getElementById("res").innerText="❌ Faux";
+errors.push("Addition erreur");
 }
+
+document.getElementById("t").innerText =
+"⏱️ Temps: " + time + "s";
+
+localStorage.setItem("errors", JSON.stringify(errors));
 }
+
 </script>
 
 </body>
