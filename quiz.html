@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quiz Startup Pro</title>
+<title>Quiz World AI</title>
 
 <style>
 body{
@@ -17,10 +17,6 @@ button{
   margin:6px;
   border-radius:10px;
 }
-input{
-  padding:8px;
-  width:75%;
-}
 .box{
   margin-top:15px;
   border-top:1px solid #334155;
@@ -31,9 +27,9 @@ input{
 
 <body>
 
-<h2>🧠 Quiz Startup Pro</h2>
+<h2>🌍 Quiz World AI</h2>
 
-<p id="info"></p>
+<p id="player"></p>
 <p id="profile"></p>
 
 <p id="question"></p>
@@ -42,71 +38,74 @@ input{
 <p id="result"></p>
 
 <button onclick="next()">➡️ Suivant</button>
-<button onclick="openChat()">💬 Chat</button>
+<button onclick="showWorld()">🌍 Classement mondial</button>
 <button onclick="home()">🏠 Accueil</button>
 
-<!-- CHAT SIMPLE -->
+<!-- WORLD RANKING -->
 <div class="box">
-<h3>💬 Chat rapide</h3>
-<input id="msg" placeholder="Message">
-<button onclick="sendMsg()">Envoyer</button>
-<div id="chat"></div>
-</div>
-
-<!-- DUEL INVITE -->
-<div class="box">
-<h3>⚔️ Duel invitation</h3>
-<input id="enemy" placeholder="Nom adversaire">
-<button onclick="invite()">Inviter</button>
-<div id="invites"></div>
+<h3>🌍 Classement mondial (simulation)</h3>
+<div id="world"></div>
 </div>
 
 <script>
 
 let player = localStorage.getItem("player") || "Anonyme";
 
-// 📊 profil
+// stats joueur
 let data = JSON.parse(localStorage.getItem("progress") || "{}");
 let level = data.level || 1;
 let xp = data.xp || 0;
-
-// stats quiz
 let score = 0;
+
 let i = 0;
 
-// IA SIMPLE (questions dynamiques)
-function generateQuestion(lvl){
+// 🧠 IA ULTRA SIMPLE (génération intelligente)
+function generateAIQuestion(level){
 
-let easy = [
-{q:"2+2=?",a:["3","4","5"],c:1,exp:"2+2=4"},
-{q:"5-1=?",a:["4","3","2"],c:0,exp:"5-1=4"}
-];
+let topics = {
+easy:[
+{q:"2+2=?",a:["3","4","5"],c:1},
+{q:"5-1=?",a:["4","3","2"],c:0},
+{q:"10/2=?",a:["2","5","10"],c:1}
+],
 
-let med = [
-{q:"10/2=?",a:["2","5","10"],c:1,exp:"10÷2=5"},
-{q:"3+3=?",a:["5","6","7"],c:1,exp:"3+3=6"}
-];
+medium:[
+{q:"12/3=?",a:["3","4","6"],c:1},
+{q:"7+8=?",a:["14","15","16"],c:1},
+{q:"9-4=?",a:["6","5","4"],c:1}
+],
 
-let hard = [
-{q:"18/3=?",a:["5","6","7"],c:1,exp:"18÷3=6"},
-{q:"25-5*2=?",a:["10","15","20"],c:0,exp:"priorité multiplication"}
-];
+hard:[
+{q:"18/3+2=?",a:["6","8","7"],c:0},
+{q:"25-5*2=?",a:["10","15","20"],c:0},
+{q:"(4+6)/2=?",a:["5","6","7"],c:0}
+]
+};
 
-let pool = lvl <= 2 ? easy : lvl <= 4 ? med : hard;
+let pool =
+level <= 2 ? topics.easy :
+level <= 4 ? topics.medium :
+topics.hard;
 
-return pool[Math.floor(Math.random()*pool.length)];
+// IA légère: mélange + adaptation
+let q = pool[Math.floor(Math.random()*pool.length)];
+
+return q;
 }
 
-let currentQ = generateQuestion(level);
+let currentQ = generateAIQuestion(level);
 
-// 🧠 PROFIL
+// 👤 PROFIL
 function updateProfile(){
 
-document.getElementById("profile").innerHTML =
-`👤 ${player} | Niveau: ${level} | XP: ${xp} | Score: ${score}`;
+document.getElementById("player").innerText =
+"👤 " + player;
+
+document.getElementById("profile").innerText =
+`⭐ Niveau: ${level} | XP: ${xp} | Score: ${score}`;
 }
 
-// LOAD QUESTION
+// LOAD
 function load(){
 
 document.getElementById("question").innerText = currentQ.q;
@@ -121,123 +120,80 @@ document.getElementById("answers").innerHTML = html;
 document.getElementById("result").innerText = "";
 
 updateProfile();
-loadChat();
-loadInvites();
 }
 
+// CHECK
 function check(n){
 
 if(n === currentQ.c){
 score++;
 xp += 10;
-document.getElementById("result").innerText = "✅ " + currentQ.exp;
+document.getElementById("result").innerText = "✅ Correct";
 }else{
 xp += 3;
-document.getElementById("result").innerText = "❌ " + currentQ.exp;
+document.getElementById("result").innerText = "❌ Faux";
 }
 
 document.querySelectorAll("#answers button").forEach(b=>b.disabled=true);
 
-// niveau auto
-if(xp >= level * 40){
+// LEVEL SYSTEM
+if(xp >= level * 50){
 level++;
 xp = 0;
 alert("🔥 Niveau supérieur !");
 }
 
 saveProgress();
+addWorldScore();
 }
 
+// NEXT QUESTION
 function next(){
 
-currentQ = generateQuestion(level);
+currentQ = generateAIQuestion(level);
 
 document.querySelectorAll("#answers button").forEach(b=>b.disabled=false);
 
 load();
 }
 
-// 💾 save
+// 💾 SAVE
 function saveProgress(){
 localStorage.setItem("progress", JSON.stringify({level,xp}));
 }
 
-// ================= CHAT =================
-function sendMsg(){
+// 🌍 COMPÉTITION MONDIALE (SIMULATION)
+function addWorldScore(){
 
-let msg = document.getElementById("msg").value;
-if(!msg) return;
+let world = JSON.parse(localStorage.getItem("world") || "[]");
 
-let chat = JSON.parse(localStorage.getItem("chat")||"[]");
-
-chat.push({user:player,msg,time:new Date().toLocaleTimeString()});
-
-localStorage.setItem("chat",JSON.stringify(chat));
-
-document.getElementById("msg").value="";
-loadChat();
-}
-
-function loadChat(){
-
-let chat = JSON.parse(localStorage.getItem("chat")||"[]");
-
-document.getElementById("chat").innerHTML =
-chat.slice(-10).map(m=>`<p><b>${m.user}</b>: ${m.msg}</p>`).join("");
-}
-
-// ================= DUEL INVITE =================
-function invite(){
-
-let enemy = document.getElementById("enemy").value;
-if(!enemy) return;
-
-let invites = JSON.parse(localStorage.getItem("invites")||"[]");
-
-invites.push({
-from:player,
-to:enemy,
-status:"pending"
+world.push({
+name:player,
+score:score,
+level:level,
+time:new Date().toLocaleTimeString()
 });
 
-localStorage.setItem("invites",JSON.stringify(invites));
+world.sort((a,b)=>b.score-a.score);
 
-document.getElementById("enemy").value="";
-loadInvites();
+world = world.slice(0,10);
+
+localStorage.setItem("world", JSON.stringify(world));
 }
 
-function loadInvites(){
+function showWorld(){
 
-let invites = JSON.parse(localStorage.getItem("invites")||"[]");
+let world = JSON.parse(localStorage.getItem("world") || "[]");
 
-document.getElementById("invites").innerHTML =
-invites.slice(-3).map((i,k)=>
-`⚔️ ${i.from} → ${i.to} (${i.status}) <br>
-<button onclick="accept(${k})">Accepter</button>`
-).join("") || "Aucune invitation";
+document.getElementById("world").innerHTML =
+world.map((p,i)=>
+`🏆 ${i+1}. ${p.name} - ${p.score} pts (lvl ${p.level})`
+).join("<br>") || "Aucun joueur";
 }
 
-function accept(i){
-
-let invites = JSON.parse(localStorage.getItem("invites")||"[]");
-
-invites[i].status = "accepted";
-
-localStorage.setItem("invites",JSON.stringify(invites));
-
-localStorage.setItem("mode","duel");
-localStorage.setItem("opponent",invites[i].from);
-
-alert("⚔️ Duel lancé !");
-}
-
-// navigation
+// HOME
 function home(){
 window.location.href="index.html";
-}
-
-function openChat(){
-alert("💬 Chat déjà intégré en bas");
 }
 
 // INIT
@@ -248,4 +204,3 @@ load();
 
 </body>
 </html>
-    
