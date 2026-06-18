@@ -2,14 +2,14 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quiz Start</title>
+<title>Quiz App</title>
 </head>
 
 <body style="font-family:Arial;text-align:center;background:#0f172a;color:white">
 
 <h1>🌍 Quiz App</h1>
 
-<input id="name" placeholder="Pseudo"><br><br>
+<input id="name" placeholder="Entre ton pseudo"><br><br>
 
 <button onclick="start()">Commencer</button>
 
@@ -17,9 +17,11 @@
 
 function start(){
 let name = document.getElementById("name").value;
+
 if(!name) name = "Anonyme";
 
 localStorage.setItem("player", name);
+
 window.location.href = "quiz.html";
 }
 
