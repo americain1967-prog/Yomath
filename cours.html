@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<body style="background:#0f172a;color:white;text-align:center">
+
+<h2>📖 Cours</h2>
+
+<p id="cours"></p>
+
+<script>
+
+let matiere = localStorage.getItem("matiere");
+
+if(matiere === "math"){
+document.getElementById("cours").innerText = "Addition, division...";
+}
+
+if(matiere === "pc"){
+document.getElementById("cours").innerText = "Température, énergie...";
+}
+
+if(matiere === "svt"){
+document.getElementById("cours").innerText = "Corps humain...";
+}
+
+</script>
+
+</body>
+</html>
