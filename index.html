@@ -2,58 +2,47 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Edu Platform</title>
+<title>Edu Platform Pro</title>
 
 <style>
 body{
-  font-family:Arial;
-  background:#0f172a;
-  color:white;
-  text-align:center;
+font-family:Arial;
+background:#0f172a;
+color:white;
+text-align:center;
 }
 
-select, input{
-  padding:10px;
-  margin:5px;
-  width:80%;
+select,input,button{
+width:80%;
+padding:10px;
+margin:5px;
+border-radius:10px;
+border:none;
 }
 
 button{
-  padding:12px;
-  width:80%;
-  margin:5px;
-  background:#2563eb;
-  color:white;
-  border:none;
-  border-radius:10px;
+background:#2563eb;
+color:white;
 }
-
 .card{
-  background:#111827;
-  margin:10px;
-  padding:10px;
-  border-radius:10px;
+background:#111827;
+margin:10px;
+padding:10px;
+border-radius:10px;
 }
 </style>
 </head>
 
 <body>
 
-<h1>🎓 Edu Platform</h1>
+<h1>🎓 Edu Platform Pro</h1>
 
-<!-- PROFIL -->
 <input id="name" placeholder="Nom élève">
 
 <select id="classe">
-<option>6e</option>
-<option>5e</option>
-<option>4e</option>
-<option>3e</option>
-<option>2nde</option>
-<option>1ère C</option>
-<option>1ère D</option>
-<option>Terminale C</option>
-<option>Terminale D</option>
+<option>6e</option><option>5e</option><option>4e</option><option>3e</option>
+<option>2nde</option><option>1ère C</option><option>1ère D</option>
+<option>Terminale C</option><option>Terminale D</option>
 </select>
 
 <select id="matiere" onchange="loadChapters()">
@@ -62,80 +51,70 @@ button{
 <option value="svt">SVT</option>
 </select>
 
-<!-- CHAPITRES DIRECTS -->
-<h3>📚 Chapitres</h3>
 <select id="chapitre"></select>
 
 <hr>
 
-<!-- MODULES DIRECTS (PAS DE PAGE CHAPITRE) -->
 <div class="card">
 
-<h3>🎯 Modules du chapitre</h3>
+<h3>📚 Modules</h3>
 
-<button onclick="openModule('cours.html')">📖 Cours</button>
-<button onclick="openModule('quiz.html')">🎮 Quiz</button>
-<button onclick="openModule('devoir.html')">📝 Devoirs (chronométrés)</button>
-<button onclick="openModule('correction.html')">✅ Correction</button>
+<button onclick="go('cours.html')">📖 Cours</button>
+<button onclick="go('quiz.html')">🎮 Quiz IA</button>
+<button onclick="go('devoir.html')">📝 Devoirs Bac</button>
+<button onclick="go('correction.html')">✅ Correction</button>
 
 </div>
 
 <div class="card">
 
-<h3>💬 Social</h3>
+<h3>⚔️ Social</h3>
 
-<button onclick="openModule('chat.html')">💬 Chat élève</button>
-<button onclick="openModule('duel.html')">⚔️ Duel invitation</button>
-<button onclick="openModule('classement.html')">🏆 Classement</button>
-<button onclick="openModule('badges.html')">🎖️ Badges</button>
+<button onclick="go('chat.html')">💬 Chat chapitre</button>
+<button onclick="go('duel.html')">⚔️ Duel (code match)</button>
+<button onclick="go('classement.html')">🏆 Classement</button>
+<button onclick="go('badges.html')">🎖️ Badges</button>
 
 </div>
 
-<p id="status"></p>
+<p id="info"></p>
 
 <script>
 
-// sauvegarde
 function save(){
-localStorage.setItem("player", document.getElementById("name").value || "Anonyme");
-localStorage.setItem("classe", document.getElementById("classe").value);
-localStorage.setItem("matiere", document.getElementById("matiere").value);
-localStorage.setItem("chapitre", document.getElementById("chapitre").value);
-
-document.getElementById("status").innerText =
-"📌 Chapitre sélectionné : " + document.getElementById("chapitre").value;
+localStorage.setItem("player",document.getElementById("name").value||"Anonyme");
+localStorage.setItem("classe",document.getElementById("classe").value);
+localStorage.setItem("matiere",document.getElementById("matiere").value);
+localStorage.setItem("chapitre",document.getElementById("chapitre").value);
 }
 
-// chapitres selon matière + classe (simple mais extensible)
+function go(page){
+save();
+window.location.href=page;
+}
+
 function loadChapters(){
 
-let m = document.getElementById("matiere").value;
-let c = document.getElementById("chapitre");
+let m=document.getElementById("matiere").value;
+let c=document.getElementById("chapitre");
 
-let data = {
-math:["Nombres","Equations","Fonctions","Géométrie"],
+let data={
+math:["Nombres","Equations","Fonctions"],
 pc:["Electricité","Energie","Température"],
 svt:["Cellule","Organes","Respiration"]
 };
 
-c.innerHTML = "";
+c.innerHTML="";
 
-data[m].forEach(ch=>{
-let opt = document.createElement("option");
-opt.value = ch;
-opt.innerText = ch;
-c.appendChild(opt);
+data[m].forEach(x=>{
+let o=document.createElement("option");
+o.value=x;
+o.innerText=x;
+c.appendChild(o);
 });
 
 }
 
-// navigation modules
-function openModule(page){
-save();
-window.location.href = page;
-}
-
-// init
 loadChapters();
 
 </script>
