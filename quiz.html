@@ -2,36 +2,31 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quiz</title>
+<title>Quiz IA</title>
 
 <style>
-body{
-    font-family:Arial;
-    background:#0f172a;
-    color:white;
-    text-align:center;
-}
-button{
-    padding:10px;
-    width:80%;
-    margin:6px;
-    border-radius:10px;
-}
+body{font-family:Arial;background:#0f172a;color:white;text-align:center}
+button{padding:10px;width:80%;margin:6px;border-radius:10px}
+#explain{margin:15px;color:#38bdf8}
 </style>
 </head>
 
 <body>
 
-<h2>🎮 Quiz</h2>
+<h2>🧠 Quiz Intelligent + Coach</h2>
 
 <p id="player"></p>
 <p id="level"></p>
-<div id="score">Score: 0</div>
+<p id="xp"></p>
+
+<div id="score"></div>
 
 <p id="question"></p>
 <div id="answers"></div>
 
-<button onclick="restart()">🔄 Rejouer</button>
+<div id="explain"></div>
+
+<button onclick="next()">➡️ Suivant</button>
 <button onclick="home()">🏠 Accueil</button>
 
 <script>
@@ -40,23 +35,41 @@ button{
 let player = localStorage.getItem("player") || "Anonyme";
 
 // 📊 progression
+let data = JSON.parse(localStorage.getItem("progress") || "{}");
+
+let level = data.level || 1;
+let xp = data.xp || 0;
+
 let score = 0;
 let i = 0;
-let level = 1;
+let mistakes = [];
 
-// 🧠 questions
+// 🧠 questions avec explications
 const questions = [
-{q:"2+2=?",a:["3","4","5"],c:1},
-{q:"Capitale BF ?",a:["Ouaga","Paris","Accra"],c:0},
-{q:"10/2=?",a:["2","5","10"],c:1},
-{q:"HTML est ?",a:["Langage","Jeu","Sport"],c:0},
-{q:"JS sert à ?",a:["Web","Cuisine","Foot"],c:0}
+{
+q:"2+2=?",
+a:["3","4","5"],
+c:1,
+exp:"2+2 = 4 car on additionne les deux nombres."
+},
+{
+q:"Capitale BF ?",
+a:["Ouaga","Paris","Accra"],
+c:0,
+exp:"La capitale du Burkina Faso est Ouagadougou."
+},
+{
+q:"10/2=?",
+a:["2","5","10"],
+c:1,
+exp:"10 divisé par 2 donne 5."
+}
 ];
 
-// afficher joueur
+// affichage joueur
 document.getElementById("player").innerText = "👤 " + player;
 
-// load question
+// LOAD
 function load(){
 
 if(i >= questions.length){
@@ -66,40 +79,102 @@ return;
 
 document.getElementById("question").innerText = questions[i].q;
 
-let html = "";
-
-questions[i].a.forEach((a,idx)=>{
-html += `<button onclick="check(${idx})">${a}</button>`;
+let html="";
+questions[i].a.forEach((a,n)=>{
+html += `<button onclick="check(${n})">${a}</button>`;
 });
 
 document.getElementById("answers").innerHTML = html;
 
+document.getElementById("explain").innerText = "";
+
 updateUI();
 }
 
-// vérifier réponse
+// CHECK
 function check(n){
 
-if(n === questions[i].c){
+let q = questions[i];
+
+if(n === q.c){
 score++;
+xp += 10;
+document.getElementById("explain").innerText = "✅ Correct ! " + q.exp;
+}else{
+xp += 2;
+mistakes.push(q);
+document.getElementById("explain").innerText = "❌ Faux ! " + q.exp;
 }
 
+// désactiver boutons
+let buttons = document.querySelectorAll("button");
+buttons.forEach(b=>b.disabled = true);
+
+}
+
+// NEXT
+function next(){
 i++;
 
-// niveaux automatiques
-if(score >= 3) level = 2;
-if(score >= 5) level = 3;
+// réactiver boutons
+let buttons = document.querySelectorAll("button");
+buttons.forEach(b=>b.disabled = false);
 
 load();
 }
 
-// fin
+// FIN
 function end(){
 
 document.getElementById("question").innerText = "🎉 FIN DU QUIZ";
 document.getElementById("answers").innerHTML = "";
+document.getElementById("explain").innerText = "";
 
-// sauvegarde classement
+// montée niveau
+if(xp >= level * 50){
+level++;
+xp = 0;
+alert("🔥 Niveau supérieur !");
+}
+
+// sauvegarde progression
+localStorage.setItem("progress", JSON.stringify({
+level: level,
+xp: xp
+}));
+
+saveRanking();
+
+// 👉 ENTRAINEMENT AUTOMATIQUE
+if(mistakes.length > 0){
+startTraining();
+}else{
+document.getElementById("score").innerText = "Parfait ! Aucune erreur 🎯";
+}
+}
+
+// 🧠 ENTRAINEMENT
+function startTraining(){
+
+i = 0;
+questions.splice(0, questions.length, ...mistakes);
+
+mistakes = [];
+
+document.getElementById("question").innerText = "🧠 Mode entraînement (corrige tes erreurs)";
+load();
+}
+
+// UI
+function updateUI(){
+document.getElementById("score").innerText = "Score: " + score;
+document.getElementById("level").innerText = "Niveau: " + level;
+document.getElementById("xp").innerText = "XP: " + xp;
+}
+
+// classement
+function saveRanking(){
+
 let ranking = JSON.parse(localStorage.getItem("ranking") || "[]");
 
 ranking.push({
@@ -114,21 +189,7 @@ ranking = ranking.slice(0,5);
 localStorage.setItem("ranking", JSON.stringify(ranking));
 }
 
-// UI
-function updateUI(){
-document.getElementById("score").innerText = "Score: " + score;
-document.getElementById("level").innerText = "Niveau: " + level;
-}
-
-// restart
-function restart(){
-score = 0;
-i = 0;
-level = 1;
-load();
-}
-
-// retour accueil
+// home
 function home(){
 window.location.href = "index.html";
 }
