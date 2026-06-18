@@ -2,56 +2,185 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chat</title>
+<title>Chat & Duel</title>
 
 <style>
-body{font-family:Arial;background:#0f172a;color:white;text-align:center}
-input{width:70%;padding:10px}
-button{padding:10px}
+body{
+  font-family:Arial;
+  background:#0f172a;
+  color:white;
+  text-align:center;
+}
+input{
+  width:70%;
+  padding:10px;
+  margin:5px;
+}
+button{
+  padding:10px;
+  width:80%;
+  margin:5px;
+  border-radius:10px;
+}
+.box{
+  margin-top:20px;
+  border-top:1px solid #334155;
+  padding-top:15px;
+}
 </style>
 </head>
 
 <body>
 
-<h2>💬 Chat Startup</h2>
+<h2>💬 Social Hub</h2>
 
-<p id="user"></p>
+<p id="profile"></p>
+
+<!-- CHAT -->
+<div class="box">
+<h3>💬 Chat</h3>
 
 <input id="msg" placeholder="Message">
-<button onclick="send()">Send</button>
+<button onclick="sendMsg()">Envoyer</button>
 
 <div id="chat"></div>
+</div>
+
+<!-- DUEL INVITATION -->
+<div class="box">
+<h3>⚔️ Invitations Duel</h3>
+
+<input id="enemy" placeholder="Nom adversaire">
+<button onclick="invite()">Envoyer invitation</button>
+
+<div id="invites"></div>
+</div>
+
+<button onclick="home()">🏠 Accueil</button>
 
 <script>
 
-let user = localStorage.getItem("player") || "Anonyme";
-document.getElementById("user").innerText = "👤 " + user;
+// 👤 joueur
+let player = localStorage.getItem("player") || "Anonyme";
 
-function send(){
+// 📊 profil intelligent simple
+let data = JSON.parse(localStorage.getItem("progress") || "{}");
+
+let level = data.level || 1;
+let xp = data.xp || 0;
+
+// PROFILE DISPLAY
+function showProfile(){
+
+let rank = level >= 5 ? "🔥 Pro" : level >= 3 ? "⚡ Intermédiaire" : "🟢 Débutant";
+
+document.getElementById("profile").innerHTML =
+`👤 ${player} | Niveau: ${level} | XP: ${xp} | Rank: ${rank}`;
+}
+
+showProfile();
+
+
+// 💬 CHAT
+function sendMsg(){
+
 let msg = document.getElementById("msg").value;
 if(!msg) return;
 
-let chat = JSON.parse(localStorage.getItem("chat")||"[]");
+let chat = JSON.parse(localStorage.getItem("chat") || "[]");
 
 chat.push({
-user,
-msg,
-time:new Date().toLocaleTimeString()
+user: player,
+msg: msg,
+time: new Date().toLocaleTimeString()
 });
 
-localStorage.setItem("chat",JSON.stringify(chat));
-document.getElementById("msg").value="";
-load();
+localStorage.setItem("chat", JSON.stringify(chat));
+
+document.getElementById("msg").value = "";
+loadChat();
 }
 
-function load(){
-let chat = JSON.parse(localStorage.getItem("chat")||"[]");
+function loadChat(){
+
+let chat = JSON.parse(localStorage.getItem("chat") || "[]");
 
 document.getElementById("chat").innerHTML =
-chat.slice(-20).map(m=>`<p><b>${m.user}</b>: ${m.msg}</p>`).join("");
+chat.slice(-15).map(m=>
+`<p><b>${m.user}</b>: ${m.msg}</p>`
+).join("");
 }
 
-load();
+loadChat();
+
+
+// ⚔️ INVITATION DUEL
+function invite(){
+
+let enemy = document.getElementById("enemy").value;
+if(!enemy) return;
+
+let invites = JSON.parse(localStorage.getItem("invites") || "[]");
+
+invites.push({
+from: player,
+to: enemy,
+status: "pending"
+});
+
+localStorage.setItem("invites", JSON.stringify(invites));
+
+document.getElementById("enemy").value = "";
+
+loadInvites();
+}
+
+function loadInvites(){
+
+let invites = JSON.parse(localStorage.getItem("invites") || "[]");
+
+let html = "";
+
+invites.forEach((i,index)=>{
+
+html += `
+<p>
+⚔️ ${i.from} → ${i.to}
+<br>
+Status: ${i.status}
+<br>
+<button onclick="accept(${index})">Accepter</button>
+</p>
+`;
+});
+
+document.getElementById("invites").innerHTML =
+html || "Aucune invitation";
+}
+
+// accepter duel
+function accept(i){
+
+let invites = JSON.parse(localStorage.getItem("invites") || "[]");
+
+invites[i].status = "accepted";
+
+localStorage.setItem("invites", JSON.stringify(invites));
+
+// lancer duel
+localStorage.setItem("mode","duel");
+localStorage.setItem("opponent",invites[i].from);
+
+window.location.href="quiz.html";
+}
+
+loadInvites();
+
+
+// 🏠 home
+function home(){
+window.location.href="index.html";
+}
 
 </script>
 
