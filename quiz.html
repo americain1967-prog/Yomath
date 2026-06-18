@@ -1,203 +1,25 @@
 <!DOCTYPE html>
 <html>
-<head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quiz Live Battle</title>
+<body style="background:#0f172a;color:white;text-align:center">
 
-<style>
-body{
-  font-family:Arial;
-  background:#0f172a;
-  color:white;
-  text-align:center;
-}
-button{
-  padding:10px;
-  width:80%;
-  margin:5px;
-  border-radius:10px;
-}
-input{
-  padding:8px;
-  width:75%;
-}
-.box{
-  margin-top:15px;
-  border-top:1px solid #334155;
-  padding-top:10px;
-}
-</style>
-</head>
+<h2>🎮 Quiz</h2>
 
-<body>
+<p>Combien font 2 + 2 ?</p>
 
-<h2>⚔️ Quiz Live Battle</h2>
+<button onclick="check(3)">3</button>
+<button onclick="check(4)">4</button>
+<button onclick="check(5)">5</button>
 
-<p id="info"></p>
-<p id="status"></p>
-
-<p id="question"></p>
-<div id="answers"></div>
-
-<p id="result"></p>
-
-<button onclick="next()">➡️ Next</button>
-<button onclick="sendScore()">🌍 Envoyer score mondial</button>
-
-<!-- CHAT LIVE -->
-<div class="box">
-<h3>💬 Chat live</h3>
-
-<input id="msg" placeholder="Message">
-<button onclick="sendMsg()">Envoyer</button>
-
-<div id="chat"></div>
-</div>
+<p id="res"></p>
 
 <script>
-
-// ================= USER =================
-let player = localStorage.getItem("player") || "Anonyme";
-let mode = localStorage.getItem("mode") || "solo";
-let opponent = localStorage.getItem("opponent") || "CPU";
-
-// ================= SOCKET =================
-let ws;
-if(mode !== "solo"){
-ws = new WebSocket("ws://localhost:3000");
-
-ws.onopen = () => {
-ws.send(JSON.stringify({
-type:"join",
-name:player,
-room:"global"
-}));
-};
-
-ws.onmessage = (m)=>{
-let data = JSON.parse(m.data);
-
-if(data.type === "chat"){
-addChat(data.name + ": " + data.msg);
-}
-if(data.type === "system"){
-addChat("🔔 " + data.msg);
-}
-};
-}
-
-// ================= GAME =================
-let score = 0;
-let enemyScore = 0;
-let i = 0;
-
-// 🧠 IA QUI POSE QUESTIONS (DYNAMIC)
-function AIQuestion(level){
-
-let pool = [
-{q:"2+2=?",a:["3","4","5"],c:1},
-{q:"5-2=?",a:["2","3","4"],c:1},
-{q:"10/2=?",a:["2","5","10"],c:1},
-{q:"3+6=?",a:["8","9","10"],c:1}
-];
-
-return pool[Math.floor(Math.random()*pool.length)];
-}
-
-let currentQ = AIQuestion(1);
-
-// ================= LOAD =================
-function load(){
-
-document.getElementById("question").innerText = currentQ.q;
-
-let html="";
-
-currentQ.a.forEach((a,n)=>{
-html += `<button onclick="check(${n})">${a}</button>`;
-});
-
-document.getElementById("answers").innerHTML = html;
-
-document.getElementById("info").innerText =
-"👤 " + player + " vs " + opponent;
-
-}
-
-// ================= CHECK =================
 function check(n){
-
-if(n === currentQ.c){
-score++;
-document.getElementById("result").innerText = "✅ Correct";
+if(n==4){
+document.getElementById("res").innerText="✅ Correct";
 }else{
-document.getElementById("result").innerText = "❌ Faux";
+document.getElementById("res").innerText="❌ Faux";
 }
-
-// duel fake update
-enemyScore += Math.floor(Math.random()*2);
-
-document.querySelectorAll("#answers button").forEach(b=>b.disabled=true);
-
 }
-
-// ================= NEXT =================
-function next(){
-
-i++;
-currentQ = AIQuestion(1);
-
-document.querySelectorAll("#answers button").forEach(b=>b.disabled=false);
-
-load();
-}
-
-// ================= WORLD SCORE =================
-function sendScore(){
-
-let world = JSON.parse(localStorage.getItem("world")||"[]");
-
-world.push({
-name:player,
-score:score,
-time:new Date().toLocaleTimeString()
-});
-
-world.sort((a,b)=>b.score-a.score);
-
-world = world.slice(0,10);
-
-localStorage.setItem("world",JSON.stringify(world));
-
-alert("🌍 Score envoyé !");
-}
-
-// ================= CHAT =================
-function sendMsg(){
-
-let msg = document.getElementById("msg").value;
-if(!msg) return;
-
-if(ws){
-ws.send(JSON.stringify({
-type:"chat",
-msg
-}));
-}
-
-addChat(player + ": " + msg);
-document.getElementById("msg").value="";
-}
-
-function addChat(text){
-
-let div = document.getElementById("chat");
-div.innerHTML += "<p>" + text + "</p>";
-}
-
-// ================= INIT =================
-load();
-
 </script>
 
 </body>
