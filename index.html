@@ -2,85 +2,108 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Edu Platform</title>
+<title>Edu Platform HUB</title>
+
+<style>
+body{
+  font-family:Arial;
+  background:#0f172a;
+  color:white;
+  text-align:center;
+}
+
+select, input{
+  padding:10px;
+  margin:5px;
+  width:80%;
+}
+
+button{
+  padding:12px;
+  width:80%;
+  margin:5px;
+  background:#2563eb;
+  color:white;
+  border:none;
+  border-radius:10px;
+}
+</style>
 </head>
 
-<body style="font-family:Arial;background:#0f172a;color:white;text-align:center">
+<body>
 
 <h1>🎓 Edu Platform</h1>
 
-<input id="name" placeholder="Nom"><br><br>
+<input id="name" placeholder="Nom élève">
 
 <select id="classe">
-<option>6e</option>
-<option>5e</option>
-<option>4e</option>
-<option>3e</option>
-<option>2nde</option>
-<option>1ère C</option>
-<option>1ère D</option>
-<option>Terminale C</option>
-<option>Terminale D</option>
-</select><br><br>
+<option>6e</option><option>5e</option><option>4e</option><option>3e</option>
+<option>2nde</option><option>1ère C</option><option>1ère D</option>
+<option>Terminale C</option><option>Terminale D</option>
+</select>
 
 <select id="matiere" onchange="loadChapters()">
 <option value="math">Maths</option>
 <option value="pc">Physique-Chimie</option>
 <option value="svt">SVT</option>
-</select><br><br>
+</select>
 
-<select id="chapitre">
-<option value="">Choisir chapitre</option>
-</select><br><br>
+<select id="chapitre"></select>
 
-<button onclick="start()">🚀 Accéder au chapitre</button>
+<hr>
 
-<p id="info"></p>
+<h3>📚 Accès chapitre</h3>
+
+<button onclick="openModule('cours.html')">📖 Cours</button>
+<button onclick="openModule('quiz.html')">🎮 Quiz</button>
+<button onclick="openModule('devoir.html')">📝 Devoirs</button>
+<button onclick="openModule('correction.html')">✅ Correction</button>
+<button onclick="openModule('chat.html')">💬 Chat</button>
+
+<hr>
+
+<h3>⚔️ Social</h3>
+
+<button onclick="openModule('duel.html')">⚔️ Duel</button>
+<button onclick="openModule('classement.html')">🏆 Classement</button>
+<button onclick="openModule('badges.html')">🎖️ Badges</button>
 
 <script>
 
+// sauvegarde profil + chapitre
+function save(){
+localStorage.setItem("player", document.getElementById("name").value || "Anonyme");
+localStorage.setItem("classe", document.getElementById("classe").value);
+localStorage.setItem("matiere", document.getElementById("matiere").value);
+localStorage.setItem("chapitre", document.getElementById("chapitre").value);
+}
+
+// chapitres simples
 function loadChapters(){
 
 let m = document.getElementById("matiere").value;
-let chap = document.getElementById("chapitre");
-
-chap.innerHTML = "";
+let c = document.getElementById("chapitre");
 
 let data = {
 math:["Addition","Equations","Fonctions"],
-pc:["Électricité","Température","Énergie"],
-svt:["Cellule","Respiration","Organes"]
+pc:["Electricité","Energie","Température"],
+svt:["Cellule","Organes","Respiration"]
 };
 
-data[m].forEach(c=>{
+c.innerHTML = "";
+
+data[m].forEach(ch=>{
 let opt = document.createElement("option");
-opt.value = c;
-opt.innerText = c;
-chap.appendChild(opt);
+opt.innerText = ch;
+opt.value = ch;
+c.appendChild(opt);
 });
 
 }
 
-function start(){
-
-let name = document.getElementById("name").value || "Anonyme";
-let classe = document.getElementById("classe").value;
-let matiere = document.getElementById("matiere").value;
-let chapitre = document.getElementById("chapitre").value;
-
-if(!chapitre){
-alert("Choisis un chapitre");
-return;
-}
-
-localStorage.setItem("player", name);
-localStorage.setItem("classe", classe);
-localStorage.setItem("matiere", matiere);
-localStorage.setItem("chapitre", chapitre);
-
-document.getElementById("info").innerText =
-"Chapitre sélectionné : " + chapitre;
-
+function openModule(page){
+save();
+window.location.href = page;
 }
 
 loadChapters();
