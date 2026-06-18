@@ -1,114 +1,35 @@
 <!DOCTYPE html>
 <html>
-<head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Realtime Chat</title>
+<body style="font-family:Arial;background:#0f172a;color:white;text-align:center">
 
-<style>
-body{
-  font-family:Arial;
-  background:#0f172a;
-  color:white;
-  text-align:center;
-}
-input,button{
-  padding:10px;
-  width:80%;
-  margin:5px;
-}
-#chat{
-  margin-top:10px;
-  text-align:left;
-  padding:10px;
-}
-</style>
-</head>
+<h2>💬 Chat Élèves</h2>
 
-<body>
-
-<h2>💬 Chat Temps Réel</h2>
-
-<input id="name" placeholder="Pseudo">
-<input id="room" placeholder="Salle (ex: math)">
-<button onclick="join()">Rejoindre salle</button>
-
-<div id="status"></div>
-
-<input id="msg" placeholder="Message">
+<input id="msg" placeholder="Écrire message">
 <button onclick="send()">Envoyer</button>
-
-<button onclick="match()">⚔️ Matchmaking</button>
 
 <div id="chat"></div>
 
 <script>
 
-let ws;
-let currentRoom = "";
+let messages = JSON.parse(localStorage.getItem("chat") || "[]");
 
-function join(){
-
-let name = document.getElementById("name").value;
-let room = document.getElementById("room").value;
-
-ws = new WebSocket("ws://localhost:3000");
-
-ws.onopen = () => {
-
-ws.send(JSON.stringify({
-type:"join",
-name,
-room
-}));
-
-currentRoom = room;
-
-document.getElementById("status").innerText =
-"🟢 Connecté à " + room;
-};
-
-ws.onmessage = (msg) => {
-
-let data = JSON.parse(msg.data);
-
-if(data.type === "chat"){
-add(`${data.name}: ${data.msg}`);
-}
-
-if(data.type === "system"){
-add("🔔 " + data.msg);
-}
-
-if(data.type === "match_found"){
-add("⚔️ Match trouvé : " + data.room);
-}
-};
+function render(){
+document.getElementById("chat").innerHTML =
+messages.map(m => "🧑 " + m).join("<br>");
 }
 
 function send(){
+let m = document.getElementById("msg").value;
+if(!m) return;
 
-let msg = document.getElementById("msg").value;
+messages.push(m);
+localStorage.setItem("chat", JSON.stringify(messages));
 
-ws.send(JSON.stringify({
-type:"chat",
-msg
-}));
-
+render();
 document.getElementById("msg").value="";
 }
 
-function match(){
-
-ws.send(JSON.stringify({
-type:"match"
-}));
-}
-
-function add(text){
-
-let div = document.getElementById("chat");
-div.innerHTML += "<p>" + text + "</p>";
-}
+render();
 
 </script>
 
