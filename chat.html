@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chat</title>
+
+<style>
+body{font-family:Arial;background:#0f172a;color:white;text-align:center}
+input{width:70%;padding:10px}
+button{padding:10px}
+</style>
+</head>
+
+<body>
+
+<h2>💬 Chat Startup</h2>
+
+<p id="user"></p>
+
+<input id="msg" placeholder="Message">
+<button onclick="send()">Send</button>
+
+<div id="chat"></div>
+
+<script>
+
+let user = localStorage.getItem("player") || "Anonyme";
+document.getElementById("user").innerText = "👤 " + user;
+
+function send(){
+let msg = document.getElementById("msg").value;
+if(!msg) return;
+
+let chat = JSON.parse(localStorage.getItem("chat")||"[]");
+
+chat.push({
+user,
+msg,
+time:new Date().toLocaleTimeString()
+});
+
+localStorage.setItem("chat",JSON.stringify(chat));
+document.getElementById("msg").value="";
+load();
+}
+
+function load(){
+let chat = JSON.parse(localStorage.getItem("chat")||"[]");
+
+document.getElementById("chat").innerHTML =
+chat.slice(-20).map(m=>`<p><b>${m.user}</b>: ${m.msg}</p>`).join("");
+}
+
+load();
+
+</script>
+
+</body>
+</html>
