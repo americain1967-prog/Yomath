@@ -1,27 +1,33 @@
 <!DOCTYPE html>
 <html>
-<body style="background:#0f172a;color:white;text-align:center">
+<body style="font-family:Arial;background:#0f172a;color:white;text-align:center">
 
-<h2>⚔️ Duel</h2>
+<h2>⚔️ Duel Quiz</h2>
 
-<p>Toi vs IA</p>
+<p id="q">2 + 2 = ?</p>
 
-<button onclick="fight()">Jouer</button>
+<button onclick="play(3)">3</button>
+<button onclick="play(4)">4</button>
+<button onclick="play(5)">5</button>
 
 <p id="r"></p>
 
 <script>
 
-function fight(){
+function play(n){
 
-let user = Math.random()*10;
-let ai = Math.random()*10;
+let ai = Math.random() > 0.5 ? 4 : 3;
 
-if(user > ai){
+if(n == 4 && ai != 4){
 document.getElementById("r").innerText="🏆 Tu gagnes";
-}else{
+}
+else if(n == ai){
+document.getElementById("r").innerText="🤝 Égalité";
+}
+else{
 document.getElementById("r").innerText="🤖 IA gagne";
 }
+
 }
 
 </script>
