@@ -2,47 +2,100 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>School AI Platform</title>
+<title>School Platform</title>
+
+<style>
+body{
+  font-family:Arial;
+  background:#0f172a;
+  color:white;
+  text-align:center;
+}
+
+input, select{
+  padding:10px;
+  margin:5px;
+  width:80%;
+}
+
+button{
+  padding:12px;
+  width:80%;
+  margin:6px;
+  border-radius:10px;
+  border:none;
+  background:#2563eb;
+  color:white;
+  font-size:16px;
+}
+
+button:hover{
+  background:#1d4ed8;
+}
+</style>
 </head>
 
-<body style="font-family:Arial;text-align:center;background:#0f172a;color:white">
+<body>
 
-<h1>🎓 School AI Platform</h1>
+<h1>🎓 School Platform</h1>
 
-<input id="name" placeholder="Nom"><br><br>
+<p>Plateforme d'apprentissage intelligente</p>
+
+<!-- PROFIL -->
+<input id="name" placeholder="Nom de l'élève">
 
 <select id="classe">
-<option>6e</option><option>5e</option><option>4e</option><option>3e</option>
-<option>2nde</option><option>1ère C</option><option>1ère D</option>
-<option>Terminale C</option><option>Terminale D</option>
-</select><br><br>
+<option>6e</option>
+<option>5e</option>
+<option>4e</option>
+<option>3e</option>
+<option>2nde</option>
+<option>1ère C</option>
+<option>1ère D</option>
+<option>Terminale C</option>
+<option>Terminale D</option>
+</select>
 
 <select id="matiere">
 <option value="math">Maths</option>
 <option value="pc">Physique-Chimie</option>
 <option value="svt">SVT</option>
-</select><br><br>
+</select>
 
-<h3>📚 Menu</h3>
+<h3>📚 Menu principal</h3>
 
 <button onclick="go('cours.html')">📖 Cours</button>
 <button onclick="go('devoir.html')">📝 Devoirs</button>
 <button onclick="go('quiz.html')">🎮 Quiz</button>
-<button onclick="go('classement.html')">🏆 Classement</button>
+
+<button onclick="go('chat.html')">💬 Chat élèves</button>
 <button onclick="go('duel.html')">⚔️ Duel</button>
+<button onclick="go('ai.html')">🧠 IA Analyse</button>
 <button onclick="go('badges.html')">🎖️ Badges</button>
+<button onclick="go('classement.html')">🏆 Classement</button>
+
+<p id="status"></p>
 
 <script>
 
+// sauvegarde profil
 function save(){
-localStorage.setItem("player", document.getElementById("name").value || "Anonyme");
-localStorage.setItem("classe", document.getElementById("classe").value);
-localStorage.setItem("matiere", document.getElementById("matiere").value);
+  let name = document.getElementById("name").value || "Anonyme";
+  let classe = document.getElementById("classe").value;
+  let matiere = document.getElementById("matiere").value;
+
+  localStorage.setItem("player", name);
+  localStorage.setItem("classe", classe);
+  localStorage.setItem("matiere", matiere);
+
+  document.getElementById("status").innerText =
+  "✅ Profil sauvegardé : " + name;
 }
 
+// navigation
 function go(page){
-save();
-window.location.href = page;
+  save();
+  window.location.href = page;
 }
 
 </script>
