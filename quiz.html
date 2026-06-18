@@ -2,119 +2,139 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quiz Startup</title>
+<title>Quiz</title>
+
+<style>
+body{
+    font-family:Arial;
+    background:#0f172a;
+    color:white;
+    text-align:center;
+}
+button{
+    padding:10px;
+    width:80%;
+    margin:6px;
+    border-radius:10px;
+}
+</style>
 </head>
 
-<body style="font-family:Arial;text-align:center;background:#0f172a;color:white">
+<body>
 
-<h2>🌍 Quiz Startup</h2>
+<h2>🎮 Quiz</h2>
 
-<input id="name" placeholder="Ton pseudo">
-<br><br>
-
-<button onclick="startGame()">Démarrer</button>
-
+<p id="player"></p>
+<p id="level"></p>
 <div id="score">Score: 0</div>
 
 <p id="question"></p>
 <div id="answers"></div>
 
-<hr>
-
-<h3>🏆 Classement local</h3>
-<div id="ranking"></div>
+<button onclick="restart()">🔄 Rejouer</button>
+<button onclick="home()">🏠 Accueil</button>
 
 <script>
 
-// 🧠 QUESTIONS
+// 👤 joueur
+let player = localStorage.getItem("player") || "Anonyme";
+
+// 📊 progression
+let score = 0;
+let i = 0;
+let level = 1;
+
+// 🧠 questions
 const questions = [
-{q:"2 + 2 = ?",a:["3","4","5"],c:1},
-{q:"Capitale BF ?",a:["Ouaga","Paris","Dakar"],c:0},
-{q:"10 / 2 = ?",a:["2","5","10"],c:1}
+{q:"2+2=?",a:["3","4","5"],c:1},
+{q:"Capitale BF ?",a:["Ouaga","Paris","Accra"],c:0},
+{q:"10/2=?",a:["2","5","10"],c:1},
+{q:"HTML est ?",a:["Langage","Jeu","Sport"],c:0},
+{q:"JS sert à ?",a:["Web","Cuisine","Foot"],c:0}
 ];
 
-let i = 0;
-let score = 0;
-let player = "";
+// afficher joueur
+document.getElementById("player").innerText = "👤 " + player;
 
-// 🚀 START
-function startGame(){
-player = document.getElementById("name").value || "Anonyme";
-loadQuestion();
+// load question
+function load(){
+
+if(i >= questions.length){
+end();
+return;
 }
-
-// 📥 LOAD
-function loadQuestion(){
 
 document.getElementById("question").innerText = questions[i].q;
 
 let html = "";
 
 questions[i].a.forEach((a,idx)=>{
-html += `<button onclick="check(${idx})">${a}</button><br><br>`;
+html += `<button onclick="check(${idx})">${a}</button>`;
 });
 
 document.getElementById("answers").innerHTML = html;
-document.getElementById("score").innerText = "Score: " + score;
+
+updateUI();
 }
 
-// ✅ CHECK
-function check(index){
+// vérifier réponse
+function check(n){
 
-if(index === questions[i].c){
+if(n === questions[i].c){
 score++;
 }
 
 i++;
 
-if(i >= questions.length){
-endGame();
-}else{
-loadQuestion();
-}
+// niveaux automatiques
+if(score >= 3) level = 2;
+if(score >= 5) level = 3;
+
+load();
 }
 
-// 🏁 FIN
-function endGame(){
+// fin
+function end(){
 
 document.getElementById("question").innerText = "🎉 FIN DU QUIZ";
 document.getElementById("answers").innerHTML = "";
 
-// 🔥 sauvegarde locale
+// sauvegarde classement
 let ranking = JSON.parse(localStorage.getItem("ranking") || "[]");
 
 ranking.push({
 name: player,
-score: score
+score: score,
+level: level
 });
 
-// tri
 ranking.sort((a,b)=>b.score-a.score);
-
-// top 5
 ranking = ranking.slice(0,5);
 
 localStorage.setItem("ranking", JSON.stringify(ranking));
-
-showRanking();
 }
 
-// 🏆 AFFICHAGE CLASSEMENT
-function showRanking(){
-
-let ranking = JSON.parse(localStorage.getItem("ranking") || "[]");
-
-let html = "";
-
-ranking.forEach((p,i)=>{
-html += `<p>🏆 ${i+1}. ${p.name} - ${p.score}</p>`;
-});
-
-document.getElementById("ranking").innerHTML = html;
+// UI
+function updateUI(){
+document.getElementById("score").innerText = "Score: " + score;
+document.getElementById("level").innerText = "Niveau: " + level;
 }
 
-// init classement
-showRanking();
+// restart
+function restart(){
+score = 0;
+i = 0;
+level = 1;
+load();
+}
+
+// retour accueil
+function home(){
+window.location.href = "index.html";
+}
+
+// start
+load();
 
 </script>
 
