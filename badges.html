@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<body style="background:#0f172a;color:white;text-align:center">
+
+<h2>🎖️ Badges</h2>
+
+<p id="b"></p>
+
+<script>
+
+let score = Math.floor(Math.random()*100);
+
+let badge =
+score > 80 ? "🔥 Expert" :
+score > 50 ? "⚡ Avancé" :
+"🟢 Débutant";
+
+document.getElementById("b").innerText =
+"Score: " + score + " | Badge: " + badge;
+
+</script>
+
+</body>
+</html>
