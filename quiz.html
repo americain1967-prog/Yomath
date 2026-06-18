@@ -2,203 +2,142 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quiz IA Avancé</title>
-
-<style>
-body{
-  font-family:Arial;
-  background:#0f172a;
-  color:white;
-  text-align:center;
-}
-button{
-  padding:10px;
-  width:80%;
-  margin:6px;
-  border-radius:10px;
-}
-#explain{margin:15px;color:#38bdf8}
-</style>
+<title>Quiz Game</title>
 </head>
 
-<body>
+<body style="font-family:Arial;text-align:center;background:#0f172a;color:white">
 
-<h2>🧠 Quiz IA Avancé</h2>
+<h2>🧠 Quiz Game</h2>
 
-<p id="player"></p>
-<p id="level"></p>
-<p id="xp"></p>
-<p id="profile"></p>
-
-<div id="score"></div>
+<p id="info"></p>
 
 <p id="question"></p>
 <div id="answers"></div>
 
-<div id="explain"></div>
+<p id="result"></p>
 
 <button onclick="next()">➡️ Suivant</button>
-<button onclick="home()">🏠 Accueil</button>
 
 <script>
 
 let player = localStorage.getItem("player") || "Anonyme";
+let mode = localStorage.getItem("mode") || "solo";
+let opponent = localStorage.getItem("opponent") || "CPU";
 
-// 📊 profil intelligent
-let data = JSON.parse(localStorage.getItem("progress") || "{}");
+// scores
+let scoreP1 = 0;
+let scoreP2 = 0;
 
-let level = data.level || 1;
-let xp = data.xp || 0;
 let score = 0;
-
 let i = 0;
-let mistakes = [];
+let turn = 1;
 
-let currentQ = null;
+// questions simples (IA légère)
+function generateQuestion(){
 
-// 🧠 IA génération questions
-function generateQuestion(level){
-
-let easy = [
-{q:"2+2=?",a:["3","4","5"],c:1,exp:"2+2 = 4"},
-{q:"5-1=?",a:["4","3","2"],c:0,exp:"5-1 = 4"}
+let pool = [
+{q:"2 + 2 ?", a:["3","4","5"], c:1},
+{q:"5 - 1 ?", a:["4","3","2"], c:0},
+{q:"10 / 2 ?", a:["2","5","10"], c:1},
+{q:"3 + 3 ?", a:["5","6","7"], c:1},
+{q:"7 - 2 ?", a:["4","5","6"], c:1}
 ];
-
-let medium = [
-{q:"10/2=?",a:["2","5","10"],c:1,exp:"10 divisé par 2 = 5"},
-{q:"12/3=?",a:["3","4","6"],c:1,exp:"12/3 = 4"}
-];
-
-let hard = [
-{q:"18/3+2=?",a:["6","8","7"],c:0,exp:"18/3=6 puis +2"},
-{q:"25-5*2=?",a:["10","15","20"],c:0,exp:"Priorité multiplication"}
-];
-
-let pool;
-
-if(level <= 2) pool = easy;
-else if(level <= 4) pool = medium;
-else pool = hard;
 
 return pool[Math.floor(Math.random()*pool.length)];
 }
 
-// 👤 init joueur
-document.getElementById("player").innerText = "👤 " + player;
+let currentQ = generateQuestion();
 
-// 🔥 génération première question
-currentQ = generateQuestion(level);
-load();
+// info
+document.getElementById("info").innerText =
+mode === "duel"
+? `⚔️ Duel: ${player} vs ${opponent}`
+: `🎮 Joueur: ${player}`;
 
-// 📥 LOAD
+// LOAD
 function load(){
+
+if(i >= 10){
+endGame();
+return;
+}
+
+currentQ = generateQuestion();
 
 document.getElementById("question").innerText = currentQ.q;
 
-let html="";
+let html = "";
+
 currentQ.a.forEach((a,n)=>{
 html += `<button onclick="check(${n})">${a}</button>`;
 });
 
 document.getElementById("answers").innerHTML = html;
-document.getElementById("explain").innerText = "";
+document.getElementById("result").innerText = "";
 
-updateUI();
 }
 
-// ✅ CHECK
+// CHECK
 function check(n){
 
-if(n === currentQ.c){
-score++;
-xp += 10;
-document.getElementById("explain").innerText = "✅ Correct ! " + currentQ.exp;
+if(mode === "duel"){
+
+    if(turn === 1){
+        if(n === currentQ.c) scoreP1++;
+        document.getElementById("result").innerText = "👉 Tour adversaire";
+        turn = 2;
+    } 
+    else {
+        if(n === currentQ.c) scoreP2++;
+        document.getElementById("result").innerText = "👉 Ton tour";
+        turn = 1;
+        i++;
+        load();
+    }
+
 }else{
-xp += 3;
-mistakes.push(currentQ);
-document.getElementById("explain").innerText = "❌ Faux ! " + currentQ.exp;
+
+    if(n === currentQ.c){
+        score++;
+        document.getElementById("result").innerText = "✅ Correct";
+    }else{
+        document.getElementById("result").innerText = "❌ Faux";
+    }
+
+}
 }
 
-// désactiver boutons
-document.querySelectorAll("#answers button").forEach(b=>b.disabled=true);
-
-}
-
-// ➡️ NEXT
+// NEXT
 function next(){
 
+if(mode !== "duel"){
 i++;
-
-// nouvelle question IA
-currentQ = generateQuestion(level);
-
-// réactiver boutons
-document.querySelectorAll("#answers button").forEach(b=>b.disabled=false);
-
 load();
-checkLevel();
-}
-
-// 📈 NIVEAU AUTOMATIQUE
-function checkLevel(){
-
-if(xp >= level * 50){
-level++;
-xp = 0;
-alert("🔥 Niveau supérieur !");
 }
 }
 
-// 🧠 PROFIL INTELLIGENT
-function updateProfile(){
+// END GAME
+function endGame(){
 
-let weak = mistakes.length > 2 ? "Faiblesses en calcul" : "Bon niveau";
+document.getElementById("question").innerText = "🏁 Fin du Quiz";
+document.getElementById("answers").innerHTML = "";
 
-document.getElementById("profile").innerText =
-"🧠 Profil: " + weak;
+if(mode === "duel"){
+
+document.getElementById("result").innerHTML =
+`<h3>${player}: ${scoreP1}</h3>
+<h3>${opponent}: ${scoreP2}</h3>`;
+
+}else{
+
+document.getElementById("result").innerHTML =
+`🎯 Score: ${score}`;
 }
 
-// UI
-function updateUI(){
-
-document.getElementById("score").innerText = "Score: " + score;
-document.getElementById("level").innerText = "Niveau: " + level;
-document.getElementById("xp").innerText = "XP: " + xp;
-
-updateProfile();
 }
 
-// 💾 sauvegarde
-function save(){
-
-localStorage.setItem("progress", JSON.stringify({
-level, xp
-}));
-
-let ranking = JSON.parse(localStorage.getItem("ranking") || "[]");
-
-ranking.push({name:player,score,level});
-
-ranking.sort((a,b)=>b.score-a.score);
-ranking = ranking.slice(0,5);
-
-localStorage.setItem("ranking", JSON.stringify(ranking));
-}
-
-// 🏠 home
-function home(){
-save();
-window.location.href = "index.html";
-}
-
-// FIN automatique si besoin (optionnel)
-setInterval(()=>{
-
-if(score >= 10){
-save();
-}
-
-},3000);
+// START
+load();
 
 </script>
 
