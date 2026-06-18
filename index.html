@@ -20,6 +20,10 @@ button{
 input{
     padding:10px;
     width:80%;
+    margin:5px;
+}
+.section{
+    margin-top:25px;
 }
 </style>
 </head>
@@ -28,34 +32,136 @@ input{
 
 <h1>🌍 Quiz Startup</h1>
 
-<input id="name" placeholder="Entre ton pseudo"><br>
-
+<!-- 🎮 MODE SOLO -->
+<div class="section">
+<h3>🎮 Jouer</h3>
+<input id="name" placeholder="Ton pseudo"><br>
 <button onclick="start()">Commencer</button>
+</div>
 
+<!-- ⏰ DEFIS -->
+<div class="section">
+<h3>⏰ Défis programmés</h3>
+<input id="dname" placeholder="Ton pseudo"><br>
+<input id="time" type="datetime-local"><br>
+<button onclick="createChallenge()">Créer défi</button>
+
+<div id="challenges"></div>
+</div>
+
+<!-- 💬 CHAT -->
+<div class="section">
+<h3>💬 Social</h3>
+<button onclick="goChat()">Accéder au chat</button>
+</div>
+
+<!-- 🏆 CLASSEMENT -->
+<div class="section">
 <h3>🏆 Classement</h3>
 <div id="ranking"></div>
+</div>
 
 <script>
 
+// 🔥 SECURITE GLOBALE (évite écran blanc)
+window.onerror = function(msg){
+    document.body.innerHTML = "<h2>❌ Erreur détectée</h2><p>Recharge la page</p>";
+};
+
+// 🎮 START QUIZ
 function start(){
-let name = document.getElementById("name").value || "Anonyme";
-localStorage.setItem("player", name);
-window.location.href = "quiz.html";
+    let name = document.getElementById("name").value || "Anonyme";
+    localStorage.setItem("player", name);
+    window.location.href = "quiz.html";
 }
 
+// 💬 CHAT
+function goChat(){
+    window.location.href = "chat.html";
+}
+
+// ⏰ CREER DEFI
+function createChallenge(){
+
+    let name = document.getElementById("dname").value || "Anonyme";
+    let time = document.getElementById("time").value;
+
+    if(!time){
+        alert("Choisis une date !");
+        return;
+    }
+
+    let challenges = JSON.parse(localStorage.getItem("challenges") || "[]");
+
+    challenges.push({name, time});
+
+    localStorage.setItem("challenges", JSON.stringify(challenges));
+
+    showChallenges();
+}
+
+// 📅 AFFICHER DEFIS
+function showChallenges(){
+
+    let challenges = JSON.parse(localStorage.getItem("challenges") || "[]");
+
+    let html = "";
+
+    challenges.forEach((c,i)=>{
+
+        let now = new Date();
+        let t = new Date(c.time);
+
+        let active = now >= t;
+
+        html += `
+        <p>
+        ${c.name} - ${c.time}<br>
+        ${active 
+            ? `<button onclick="startChallenge(${i})">Jouer</button>` 
+            : "⏳ En attente"}
+        </p>
+        `;
+    });
+
+    document.getElementById("challenges").innerHTML = html || "Aucun défi";
+}
+
+// ▶️ LANCER DEFI
+function startChallenge(i){
+
+    let challenges = JSON.parse(localStorage.getItem("challenges") || "[]");
+
+    localStorage.setItem("player", challenges[i].name);
+
+    window.location.href = "quiz.html";
+}
+
+// 🏆 CLASSEMENT
 function showRanking(){
-let ranking = JSON.parse(localStorage.getItem("ranking") || "[]");
 
-let html = "";
+    let ranking = JSON.parse(localStorage.getItem("ranking") || "[]");
 
-ranking.forEach((p,i)=>{
-html += `<p>🏆 ${i+1}. ${p.name} - ${p.score} (Niv ${p.level})</p>`;
-});
+    let html = "";
 
-document.getElementById("ranking").innerHTML = html || "Aucun score";
+    ranking.forEach((p,i)=>{
+        html += `<p>🏆 ${i+1}. ${p.name} - ${p.score} (Niv ${p.level || 1})</p>`;
+    });
+
+    document.getElementById("ranking").innerHTML = html || "Aucun score";
 }
 
-showRanking();
+// 🚀 INIT SAFE
+function init(){
+    try{
+        showChallenges();
+        showRanking();
+    }catch(e){
+        console.log("init error", e);
+    }
+}
+
+init();
 
 </script>
 
