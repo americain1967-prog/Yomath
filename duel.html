@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<body style="background:#0f172a;color:white;text-align:center">
+
+<h2>⚔️ Duel</h2>
+
+<p>Toi vs IA</p>
+
+<button onclick="fight()">Jouer</button>
+
+<p id="r"></p>
+
+<script>
+
+function fight(){
+
+let user = Math.random()*10;
+let ai = Math.random()*10;
+
+if(user > ai){
+document.getElementById("r").innerText="🏆 Tu gagnes";
+}else{
+document.getElementById("r").innerText="🤖 IA gagne";
+}
+}
+
+</script>
+
+</body>
+</html>
