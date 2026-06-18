@@ -2,29 +2,27 @@
 <html>
 <body style="font-family:Arial;background:#0f172a;color:white;text-align:center">
 
-<h2>💬 Chat Chapitre</h2>
+<h2>💬 Chat Mondial</h2>
 
-<input id="m">
+<input id="msg">
 <button onclick="send()">Envoyer</button>
 
 <div id="box"></div>
 
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+
 <script>
 
-let key="chat";
-let msg=JSON.parse(localStorage.getItem(key)||"[]");
+const socket = io("http://localhost:3000");
 
-function render(){
-document.getElementById("box").innerHTML=msg.join("<br>");
-}
+socket.on("chat",(data)=>{
+document.getElementById("box").innerHTML += "<br>" + data;
+});
 
 function send(){
-msg.push(localStorage.getItem("player")+": "+document.getElementById("m").value);
-localStorage.setItem(key,JSON.stringify(msg));
-render();
+let m = document.getElementById("msg").value;
+socket.emit("chat", m);
 }
-
-render();
 
 </script>
 
