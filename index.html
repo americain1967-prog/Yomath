@@ -2,47 +2,14 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>School Platform</title>
-
-<style>
-body{
-  font-family:Arial;
-  background:#0f172a;
-  color:white;
-  text-align:center;
-}
-
-input, select{
-  padding:10px;
-  margin:5px;
-  width:80%;
-}
-
-button{
-  padding:12px;
-  width:80%;
-  margin:6px;
-  border-radius:10px;
-  border:none;
-  background:#2563eb;
-  color:white;
-  font-size:16px;
-}
-
-button:hover{
-  background:#1d4ed8;
-}
-</style>
+<title>Edu Platform</title>
 </head>
 
-<body>
+<body style="font-family:Arial;background:#0f172a;color:white;text-align:center">
 
-<h1>🎓 School Platform</h1>
+<h1>🎓 Edu Platform</h1>
 
-<p>Plateforme d'apprentissage intelligente</p>
-
-<!-- PROFIL -->
-<input id="name" placeholder="Nom de l'élève">
+<input id="name" placeholder="Nom"><br><br>
 
 <select id="classe">
 <option>6e</option>
@@ -54,49 +21,69 @@ button:hover{
 <option>1ère D</option>
 <option>Terminale C</option>
 <option>Terminale D</option>
-</select>
+</select><br><br>
 
-<select id="matiere">
+<select id="matiere" onchange="loadChapters()">
 <option value="math">Maths</option>
 <option value="pc">Physique-Chimie</option>
 <option value="svt">SVT</option>
-</select>
+</select><br><br>
 
-<h3>📚 Menu principal</h3>
+<select id="chapitre">
+<option value="">Choisir chapitre</option>
+</select><br><br>
 
-<button onclick="go('cours.html')">📖 Cours</button>
-<button onclick="go('devoir.html')">📝 Devoirs</button>
-<button onclick="go('quiz.html')">🎮 Quiz</button>
+<button onclick="start()">🚀 Accéder au chapitre</button>
 
-<button onclick="go('chat.html')">💬 Chat élèves</button>
-<button onclick="go('duel.html')">⚔️ Duel</button>
-<button onclick="go('ai.html')">🧠 IA Analyse</button>
-<button onclick="go('badges.html')">🎖️ Badges</button>
-<button onclick="go('classement.html')">🏆 Classement</button>
-
-<p id="status"></p>
+<p id="info"></p>
 
 <script>
 
-// sauvegarde profil
-function save(){
-  let name = document.getElementById("name").value || "Anonyme";
-  let classe = document.getElementById("classe").value;
-  let matiere = document.getElementById("matiere").value;
+function loadChapters(){
 
-  localStorage.setItem("player", name);
-  localStorage.setItem("classe", classe);
-  localStorage.setItem("matiere", matiere);
+let m = document.getElementById("matiere").value;
+let chap = document.getElementById("chapitre");
 
-  document.getElementById("status").innerText =
-  "✅ Profil sauvegardé : " + name;
+chap.innerHTML = "";
+
+let data = {
+math:["Addition","Equations","Fonctions"],
+pc:["Électricité","Température","Énergie"],
+svt:["Cellule","Respiration","Organes"]
+};
+
+data[m].forEach(c=>{
+let opt = document.createElement("option");
+opt.value = c;
+opt.innerText = c;
+chap.appendChild(opt);
+});
+
 }
 
-// navigation
-function go(page){
-  save();
-  window.location.href = page;
+function start(){
+
+let name = document.getElementById("name").value || "Anonyme";
+let classe = document.getElementById("classe").value;
+let matiere = document.getElementById("matiere").value;
+let chapitre = document.getElementById("chapitre").value;
+
+if(!chapitre){
+alert("Choisis un chapitre");
+return;
 }
+
+localStorage.setItem("player", name);
+localStorage.setItem("classe", classe);
+localStorage.setItem("matiere", matiere);
+localStorage.setItem("chapitre", chapitre);
+
+document.getElementById("info").innerText =
+"Chapitre sélectionné : " + chapitre;
+
+}
+
+loadChapters();
 
 </script>
 
