@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chapitre Hub</title>
+<title>Chapitre</title>
 
 <style>
 body{
@@ -21,7 +21,6 @@ button{
   background:#2563eb;
   color:white;
 }
-
 .card{
   background:#111827;
   margin:10px;
@@ -39,79 +38,99 @@ button{
 <p id="info"></p>
 </div>
 
-<!-- MENU PRINCIPAL DU CHAPITRE -->
 <button onclick="go('cours.html')">📖 Cours</button>
 <button onclick="go('quiz.html')">🎮 Quiz</button>
-<button onclick="go('devoir.html')">📝 Exercice / Devoir</button>
+<button onclick="go('devoir.html')">📝 Exos</button>
 <button onclick="go('correction.html')">✅ Correction</button>
-<button onclick="go('chat.html')">💬 Aide (Chat)</button>
+<button onclick="go('chat.html')">💬 Chat</button>
 
 <hr>
 
-<!-- BONUS SYSTEME -->
-<button onclick="showScore()">🏆 Voir score</button>
-<button onclick="showBadges()">🎖️ Badges</button>
-<button onclick="showAI()">🧠 Analyse IA</button>
+<h3>⚔️ Compétition</h3>
 
-<div class="card" id="extra"></div>
+<button onclick="startMatch()">⚔️ Duel élève</button>
+<button onclick="showRanking()">🏆 Classement</button>
+<button onclick="autoCompetition()">🌍 Compétition auto</button>
+
+<div class="card" id="out"></div>
 
 <script>
 
-// récupération contexte
 let player = localStorage.getItem("player");
 let classe = localStorage.getItem("classe");
 let matiere = localStorage.getItem("matiere");
 let chapitre = localStorage.getItem("chapitre");
 
-// affichage info
 document.getElementById("info").innerText =
-"👤 " + player + " | 📘 " + classe + " | 📚 " + matiere + " | 📌 " + chapitre;
+player+" | "+classe+" | "+matiere+" | "+chapitre;
 
-// navigation
-function go(page){
-window.location.href = page;
+function go(p){
+window.location.href = p;
 }
 
-// score simple
-function showScore(){
-let score = localStorage.getItem("score") || 0;
-document.getElementById("extra").innerText =
-"🏆 Score actuel : " + score;
+//
+// ⚔️ DUEL SIMULÉ (INVITATION FUTURE)
+//
+function startMatch(){
+
+let enemy = "Joueur_" + Math.floor(Math.random()*100);
+
+let score1 = Math.floor(Math.random()*10);
+let score2 = Math.floor(Math.random()*10);
+
+let result = "";
+
+if(score1 > score2){
+result = "🏆 Tu as gagné contre " + enemy;
+}else if(score1 < score2){
+result = "🤖 Tu as perdu contre " + enemy;
+}else{
+result = "🤝 Égalité avec " + enemy;
 }
 
-// badges simples
-function showBadges(){
+// sauvegarde score global
+let score = Number(localStorage.getItem("score")||0);
+localStorage.setItem("score", score + (score1>score2?5:1));
 
-let score = Number(localStorage.getItem("score") || 0);
-
-let badge = "";
-
-if(score > 20) badge = "🔥 Expert";
-else if(score > 10) badge = "⚡ Avancé";
-else badge = "🟢 Débutant";
-
-document.getElementById("extra").innerText =
-"🎖️ Badge : " + badge;
+document.getElementById("out").innerText = result;
 }
 
-// IA analyse simple
-function showAI(){
+//
+// 🏆 CLASSEMENT LOCAL SIMULÉ
+//
+function showRanking(){
 
-let msg = "";
+let players = JSON.parse(localStorage.getItem("ranking")||"[]");
 
-if(matiere === "math"){
-msg = "🧠 IA : concentre-toi sur les exercices et calculs.";
+players.push({
+name: player,
+score: Number(localStorage.getItem("score")||0)
+});
+
+players.sort((a,b)=>b.score-a.score);
+
+localStorage.setItem("ranking", JSON.stringify(players));
+
+document.getElementById("out").innerHTML =
+players.map((p,i)=>`${i+1}. ${p.name} - ${p.score}`).join("<br>");
 }
 
-if(matiere === "pc"){
-msg = "🧠 IA : révise les formules et expériences.";
+//
+// 🌍 COMPÉTITION AUTOMATIQUE
+//
+function autoCompetition(){
+
+let msg = "🌍 Tournoi lancé...\n";
+
+let result = Math.random();
+
+if(result > 0.5){
+msg += "🔥 Tu es qualifié pour le niveau supérieur";
+}else{
+msg += "❌ Éliminé, entraîne-toi";
 }
 
-if(matiere === "svt"){
-msg = "🧠 IA : comprends les schémas et processus biologiques.";
-}
-
-document.getElementById("extra").innerText = msg;
+document.getElementById("out").innerText = msg;
 }
 
 </script>
