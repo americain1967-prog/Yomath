@@ -1,34 +1,18 @@
-<!DOCTYPE html>
-<html>
-<body style="font-family:Arial;background:#0f172a;color:white;text-align:center">
-
-<h2>⚔️ Duel Code Match</h2>
-
-<input id="code" placeholder="Code match">
-
-<button onclick="create()">Créer</button>
-<button onclick="join()">Rejoindre</button>
-
-<p id="out"></p>
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 
 <script>
 
-function create(){
-let c=Math.floor(Math.random()*9999);
-localStorage.setItem("match",c);
-document.getElementById("out").innerText="Code: "+c;
+const socket = io("http://localhost:3000");
+
+function sendDuel(){
+socket.emit("duel", {
+player: localStorage.getItem("player"),
+score: Math.random()*10
+});
 }
 
-function join(){
-let c=document.getElementById("code").value;
-if(c==localStorage.getItem("match")){
-document.getElementById("out").innerText="⚔️ Match OK";
-}else{
-document.getElementById("out").innerText="❌ Code faux";
-}
-}
+socket.on("duel",(data)=>{
+console.log("Duel update:", data);
+});
 
 </script>
-
-</body>
-</html>
