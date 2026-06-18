@@ -1,25 +1,131 @@
 <!DOCTYPE html>
 <html>
-<body style="background:#0f172a;color:white;text-align:center">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz Final</title>
 
-<h2>🎮 Quiz</h2>
+<style>
+body{
+font-family:Arial;
+background:#0f172a;
+color:white;
+text-align:center;
+}
+button{
+padding:10px;
+width:80%;
+margin:5px;
+}
+</style>
+</head>
 
-<p>Combien font 2 + 2 ?</p>
+<body>
 
-<button onclick="check(3)">3</button>
-<button onclick="check(4)">4</button>
-<button onclick="check(5)">5</button>
+<h2>🧠 Quiz Intelligent</h2>
 
-<p id="res"></p>
+<p id="info"></p>
+<p id="question"></p>
+<div id="answers"></div>
+
+<p id="result"></p>
+
+<button onclick="next()">➡️ Suivant</button>
+<button onclick="seeCorrection()">📘 Correction</button>
 
 <script>
+
+let player = localStorage.getItem("player");
+let classe = localStorage.getItem("classe");
+let matiere = localStorage.getItem("matiere");
+
+let score = 0;
+
+let correction = "";
+
+function generate(){
+
+if(matiere === "math"){
+
+if(classe === "6e"){
+return {q:"2+3=?",a:["4","5","6"],c:1,exp:"2+3=5"};
+}
+
+if(classe === "5e"){
+return {q:"12/3=?",a:["3","4","5"],c:1,exp:"12÷3=4"};
+}
+
+if(classe === "4e"){
+return {q:"5x + 5 = 20 → x=?",a:["2","3","4"],c:0,exp:"5x=15 donc x=3"};
+}
+
+}
+
+if(matiere === "pc"){
+return {q:"Eau bout à ?",a:["50°C","100°C","150°C"],c:1,exp:"100°C est l’ébullition"};
+}
+
+if(matiere === "svt"){
+return {q:"Respiration organe ?",a:["Cœur","Poumon","Foie"],c:1,exp:"Le poumon"};
+}
+
+return {q:"Erreur",a:["OK"],c:0,exp:""};
+}
+
+let currentQ = generate();
+
+function load(){
+
+document.getElementById("info").innerText =
+`${player} | ${classe} | ${matiere} | Score: ${score}`;
+
+document.getElementById("question").innerText = currentQ.q;
+
+let html="";
+
+currentQ.a.forEach((a,n)=>{
+html += `<button onclick="check(${n})">${a}</button>`;
+});
+
+document.getElementById("answers").innerHTML = html;
+}
+
 function check(n){
-if(n==4){
-document.getElementById("res").innerText="✅ Correct";
+
+if(n === currentQ.c){
+score++;
+document.getElementById("result").innerText = "✅ Correct";
 }else{
-document.getElementById("res").innerText="❌ Faux";
+document.getElementById("result").innerText = "❌ Faux";
 }
+
+// correction enregistrée
+correction += currentQ.q + " → " + currentQ.exp + "\n";
+
+document.querySelectorAll("button").forEach(b=>{
+if(b.innerText !== "➡️ Suivant" && b.innerText !== "📘 Correction"){
+b.disabled = true;
 }
+});
+
+}
+
+function next(){
+
+currentQ = generate();
+
+document.querySelectorAll("button").forEach(b=>b.disabled=false);
+
+load();
+}
+
+function seeCorrection(){
+
+localStorage.setItem("correction", correction);
+window.location.href = "correction.html";
+}
+
+load();
+
 </script>
 
 </body>
