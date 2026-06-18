@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<body style="font-family:Arial;background:#0f172a;color:white;text-align:center">
+
+<h2>🧠 IA Analyse</h2>
+
+<p id="out"></p>
+
+<script>
+
+let errors = JSON.parse(localStorage.getItem("errors") || "[]");
+
+let analysis = "";
+
+if(errors.length == 0){
+analysis = "🔥 Très bon niveau";
+}
+else if(errors.length < 3){
+analysis = "⚡ Moyen, revoir bases";
+}
+else{
+analysis = "📚 Difficultés, entraînement conseillé";
+}
+
+document.getElementById("out").innerText = analysis;
+
+</script>
+
+</body>
+</html>
