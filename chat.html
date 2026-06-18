@@ -1,88 +1,28 @@
 <!DOCTYPE html>
 <html>
-<head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chat Chapitre</title>
+<body style="font-family:Arial;background:#0f172a;color:white;text-align:center">
 
-<style>
-body{
-  font-family:Arial;
-  background:#0f172a;
-  color:white;
-  text-align:center;
-}
+<h2>💬 Chat Chapitre</h2>
 
-input{
-  padding:10px;
-  width:70%;
-}
-
-button{
-  padding:10px;
-  width:25%;
-  background:#2563eb;
-  color:white;
-  border:none;
-}
-
-#box{
-  margin-top:20px;
-  text-align:left;
-  padding:10px;
-}
-</style>
-</head>
-
-<body>
-
-<h2>💬 Chat du Chapitre</h2>
-
-<p id="info"></p>
-
-<input id="msg" placeholder="Pose ta question...">
+<input id="m">
 <button onclick="send()">Envoyer</button>
 
 <div id="box"></div>
 
 <script>
 
-// contexte chapitre
-let player = localStorage.getItem("player");
-let classe = localStorage.getItem("classe");
-let matiere = localStorage.getItem("matiere");
-let chapitre = localStorage.getItem("chapitre");
-
-// clé unique du chat (important)
-let key = "chat_" + classe + "_" + matiere + "_" + chapitre;
-
-// charger messages
-let messages = JSON.parse(localStorage.getItem(key) || "[]");
+let key="chat";
+let msg=JSON.parse(localStorage.getItem(key)||"[]");
 
 function render(){
-document.getElementById("box").innerHTML =
-messages.map(m => "🧑 " + m).join("<br>");
+document.getElementById("box").innerHTML=msg.join("<br>");
 }
 
-// envoyer message
 function send(){
-
-let m = document.getElementById("msg").value;
-if(!m) return;
-
-// ajout message
-messages.push(player + ": " + m);
-
-// sauvegarde
-localStorage.setItem(key, JSON.stringify(messages));
-
-document.getElementById("msg").value = "";
-
+msg.push(localStorage.getItem("player")+": "+document.getElementById("m").value);
+localStorage.setItem(key,JSON.stringify(msg));
 render();
 }
-
-// info contexte
-document.getElementById("info").innerText =
-classe + " | " + matiere + " | " + chapitre;
 
 render();
 
