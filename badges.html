@@ -1,22 +1,18 @@
 <!DOCTYPE html>
 <html>
-<body style="background:#0f172a;color:white;text-align:center">
+<body style="font-family:Arial;background:#0f172a;color:white;text-align:center">
 
 <h2>🎖️ Badges</h2>
 
-<p id="b"></p>
-
 <script>
 
-let score = Math.floor(Math.random()*100);
+let s=localStorage.getItem("score")||0;
 
-let badge =
-score > 80 ? "🔥 Expert" :
-score > 50 ? "⚡ Avancé" :
-"🟢 Débutant";
+let b="Débutant";
+if(s>10)b="Avancé";
+if(s>20)b="Expert";
 
-document.getElementById("b").innerText =
-"Score: " + score + " | Badge: " + badge;
+document.write("Score: "+s+"<br>Badge: "+b);
 
 </script>
 
