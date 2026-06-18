@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chapitre</title>
+<title>Chapitre Hub</title>
 
 <style>
 body{
@@ -21,31 +21,43 @@ button{
   background:#2563eb;
   color:white;
 }
+
+.card{
+  background:#111827;
+  margin:10px;
+  padding:10px;
+  border-radius:10px;
+}
 </style>
 </head>
 
 <body>
 
-<h2>📚 Chapitre</h2>
+<h2>📚 Chapitre Hub</h2>
 
+<div class="card">
 <p id="info"></p>
+</div>
 
-<h3>🎯 Actions</h3>
-
-<button onclick="go('cours.html')">📖 Cours du chapitre</button>
-<button onclick="go('quiz.html')">🎮 Quiz du chapitre</button>
-<button onclick="go('devoir.html')">📝 Devoir</button>
+<!-- MENU PRINCIPAL DU CHAPITRE -->
+<button onclick="go('cours.html')">📖 Cours</button>
+<button onclick="go('quiz.html')">🎮 Quiz</button>
+<button onclick="go('devoir.html')">📝 Exercice / Devoir</button>
 <button onclick="go('correction.html')">✅ Correction</button>
-<button onclick="go('chat.html')">💬 Chat du chapitre</button>
+<button onclick="go('chat.html')">💬 Aide (Chat)</button>
 
 <hr>
 
-<h3>🧠 Résumé IA</h3>
-<p id="ai"></p>
+<!-- BONUS SYSTEME -->
+<button onclick="showScore()">🏆 Voir score</button>
+<button onclick="showBadges()">🎖️ Badges</button>
+<button onclick="showAI()">🧠 Analyse IA</button>
+
+<div class="card" id="extra"></div>
 
 <script>
 
-// récupération des données
+// récupération contexte
 let player = localStorage.getItem("player");
 let classe = localStorage.getItem("classe");
 let matiere = localStorage.getItem("matiere");
@@ -53,28 +65,53 @@ let chapitre = localStorage.getItem("chapitre");
 
 // affichage info
 document.getElementById("info").innerText =
-player + " | " + classe + " | " + matiere + " | " + chapitre;
-
-// IA simple de contexte
-let aiText = "";
-
-if(matiere === "math"){
-aiText = "📊 Ce chapitre contient des exercices de raisonnement et calcul.";
-}
-
-if(matiere === "pc"){
-aiText = "⚡ Ce chapitre traite des phénomènes physiques et énergie.";
-}
-
-if(matiere === "svt"){
-aiText = "🧬 Ce chapitre parle du vivant et des systèmes biologiques.";
-}
-
-document.getElementById("ai").innerText = aiText;
+"👤 " + player + " | 📘 " + classe + " | 📚 " + matiere + " | 📌 " + chapitre;
 
 // navigation
 function go(page){
 window.location.href = page;
+}
+
+// score simple
+function showScore(){
+let score = localStorage.getItem("score") || 0;
+document.getElementById("extra").innerText =
+"🏆 Score actuel : " + score;
+}
+
+// badges simples
+function showBadges(){
+
+let score = Number(localStorage.getItem("score") || 0);
+
+let badge = "";
+
+if(score > 20) badge = "🔥 Expert";
+else if(score > 10) badge = "⚡ Avancé";
+else badge = "🟢 Débutant";
+
+document.getElementById("extra").innerText =
+"🎖️ Badge : " + badge;
+}
+
+// IA analyse simple
+function showAI(){
+
+let msg = "";
+
+if(matiere === "math"){
+msg = "🧠 IA : concentre-toi sur les exercices et calculs.";
+}
+
+if(matiere === "pc"){
+msg = "🧠 IA : révise les formules et expériences.";
+}
+
+if(matiere === "svt"){
+msg = "🧠 IA : comprends les schémas et processus biologiques.";
+}
+
+document.getElementById("extra").innerText = msg;
 }
 
 </script>
