@@ -1,17 +1,26 @@
 <!DOCTYPE html>
 <html>
-<body style="font-family:Arial;background:#111;color:white;text-align:center">
+<body style="background:#0f172a;color:white;text-align:center">
 
-<h1>🏆 Ranking</h1>
+<h2>🏆 Classement</h2>
 
-<div id="list"></div>
+<div id="c"></div>
 
 <script>
 
-let b=JSON.parse(localStorage.getItem("board")||"[]");
+let world = JSON.parse(localStorage.getItem("world")||"[]");
 
-document.getElementById("list").innerHTML =
-b.length ? b.map((s,i)=>`<p>#${i+1} - ${s}</p>`).join("") : "No score";
+world.push({
+name:localStorage.getItem("player"),
+score:Math.floor(Math.random()*100)
+});
+
+world.sort((a,b)=>b.score-a.score);
+
+localStorage.setItem("world",JSON.stringify(world));
+
+document.getElementById("c").innerHTML =
+world.map((p,i)=>`${i+1}. ${p.name} - ${p.score}`).join("<br>");
 
 </script>
 
