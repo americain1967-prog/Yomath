@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Edu Platform HUB</title>
+<title>Edu Platform</title>
 
 <style>
 body{
@@ -27,6 +27,13 @@ button{
   border:none;
   border-radius:10px;
 }
+
+.card{
+  background:#111827;
+  margin:10px;
+  padding:10px;
+  border-radius:10px;
+}
 </style>
 </head>
 
@@ -34,12 +41,19 @@ button{
 
 <h1>🎓 Edu Platform</h1>
 
+<!-- PROFIL -->
 <input id="name" placeholder="Nom élève">
 
 <select id="classe">
-<option>6e</option><option>5e</option><option>4e</option><option>3e</option>
-<option>2nde</option><option>1ère C</option><option>1ère D</option>
-<option>Terminale C</option><option>Terminale D</option>
+<option>6e</option>
+<option>5e</option>
+<option>4e</option>
+<option>3e</option>
+<option>2nde</option>
+<option>1ère C</option>
+<option>1ère D</option>
+<option>Terminale C</option>
+<option>Terminale D</option>
 </select>
 
 <select id="matiere" onchange="loadChapters()">
@@ -48,44 +62,58 @@ button{
 <option value="svt">SVT</option>
 </select>
 
+<!-- CHAPITRES DIRECTS -->
+<h3>📚 Chapitres</h3>
 <select id="chapitre"></select>
 
 <hr>
 
-<h3>📚 Accès chapitre</h3>
+<!-- MODULES DIRECTS (PAS DE PAGE CHAPITRE) -->
+<div class="card">
+
+<h3>🎯 Modules du chapitre</h3>
 
 <button onclick="openModule('cours.html')">📖 Cours</button>
 <button onclick="openModule('quiz.html')">🎮 Quiz</button>
-<button onclick="openModule('devoir.html')">📝 Devoirs</button>
+<button onclick="openModule('devoir.html')">📝 Devoirs (chronométrés)</button>
 <button onclick="openModule('correction.html')">✅ Correction</button>
-<button onclick="openModule('chat.html')">💬 Chat</button>
 
-<hr>
+</div>
 
-<h3>⚔️ Social</h3>
+<div class="card">
 
-<button onclick="openModule('duel.html')">⚔️ Duel</button>
+<h3>💬 Social</h3>
+
+<button onclick="openModule('chat.html')">💬 Chat élève</button>
+<button onclick="openModule('duel.html')">⚔️ Duel invitation</button>
 <button onclick="openModule('classement.html')">🏆 Classement</button>
 <button onclick="openModule('badges.html')">🎖️ Badges</button>
 
+</div>
+
+<p id="status"></p>
+
 <script>
 
-// sauvegarde profil + chapitre
+// sauvegarde
 function save(){
 localStorage.setItem("player", document.getElementById("name").value || "Anonyme");
 localStorage.setItem("classe", document.getElementById("classe").value);
 localStorage.setItem("matiere", document.getElementById("matiere").value);
 localStorage.setItem("chapitre", document.getElementById("chapitre").value);
+
+document.getElementById("status").innerText =
+"📌 Chapitre sélectionné : " + document.getElementById("chapitre").value;
 }
 
-// chapitres simples
+// chapitres selon matière + classe (simple mais extensible)
 function loadChapters(){
 
 let m = document.getElementById("matiere").value;
 let c = document.getElementById("chapitre");
 
 let data = {
-math:["Addition","Equations","Fonctions"],
+math:["Nombres","Equations","Fonctions","Géométrie"],
 pc:["Electricité","Energie","Température"],
 svt:["Cellule","Organes","Respiration"]
 };
@@ -94,18 +122,20 @@ c.innerHTML = "";
 
 data[m].forEach(ch=>{
 let opt = document.createElement("option");
-opt.innerText = ch;
 opt.value = ch;
+opt.innerText = ch;
 c.appendChild(opt);
 });
 
 }
 
+// navigation modules
 function openModule(page){
 save();
 window.location.href = page;
 }
 
+// init
 loadChapters();
 
 </script>
