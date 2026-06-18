@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quiz World AI</title>
+<title>Quiz Live Battle</title>
 
 <style>
 body{
@@ -14,8 +14,12 @@ body{
 button{
   padding:10px;
   width:80%;
-  margin:6px;
+  margin:5px;
   border-radius:10px;
+}
+input{
+  padding:8px;
+  width:75%;
 }
 .box{
   margin-top:15px;
@@ -27,150 +31,135 @@ button{
 
 <body>
 
-<h2>🌍 Quiz World AI</h2>
+<h2>⚔️ Quiz Live Battle</h2>
 
-<p id="player"></p>
-<p id="profile"></p>
+<p id="info"></p>
+<p id="status"></p>
 
 <p id="question"></p>
 <div id="answers"></div>
 
 <p id="result"></p>
 
-<button onclick="next()">➡️ Suivant</button>
-<button onclick="showWorld()">🌍 Classement mondial</button>
-<button onclick="home()">🏠 Accueil</button>
+<button onclick="next()">➡️ Next</button>
+<button onclick="sendScore()">🌍 Envoyer score mondial</button>
 
-<!-- WORLD RANKING -->
+<!-- CHAT LIVE -->
 <div class="box">
-<h3>🌍 Classement mondial (simulation)</h3>
-<div id="world"></div>
+<h3>💬 Chat live</h3>
+
+<input id="msg" placeholder="Message">
+<button onclick="sendMsg()">Envoyer</button>
+
+<div id="chat"></div>
 </div>
 
 <script>
 
+// ================= USER =================
 let player = localStorage.getItem("player") || "Anonyme";
+let mode = localStorage.getItem("mode") || "solo";
+let opponent = localStorage.getItem("opponent") || "CPU";
 
-// stats joueur
-let data = JSON.parse(localStorage.getItem("progress") || "{}");
-let level = data.level || 1;
-let xp = data.xp || 0;
-let score = 0;
+// ================= SOCKET =================
+let ws;
+if(mode !== "solo"){
+ws = new WebSocket("ws://localhost:3000");
 
-let i = 0;
-
-// 🧠 IA ULTRA SIMPLE (génération intelligente)
-function generateAIQuestion(level){
-
-let topics = {
-easy:[
-{q:"2+2=?",a:["3","4","5"],c:1},
-{q:"5-1=?",a:["4","3","2"],c:0},
-{q:"10/2=?",a:["2","5","10"],c:1}
-],
-
-medium:[
-{q:"12/3=?",a:["3","4","6"],c:1},
-{q:"7+8=?",a:["14","15","16"],c:1},
-{q:"9-4=?",a:["6","5","4"],c:1}
-],
-
-hard:[
-{q:"18/3+2=?",a:["6","8","7"],c:0},
-{q:"25-5*2=?",a:["10","15","20"],c:0},
-{q:"(4+6)/2=?",a:["5","6","7"],c:0}
-]
+ws.onopen = () => {
+ws.send(JSON.stringify({
+type:"join",
+name:player,
+room:"global"
+}));
 };
 
-let pool =
-level <= 2 ? topics.easy :
-level <= 4 ? topics.medium :
-topics.hard;
+ws.onmessage = (m)=>{
+let data = JSON.parse(m.data);
 
-// IA légère: mélange + adaptation
-let q = pool[Math.floor(Math.random()*pool.length)];
-
-return q;
+if(data.type === "chat"){
+addChat(data.name + ": " + data.msg);
+}
+if(data.type === "system"){
+addChat("🔔 " + data.msg);
+}
+};
 }
 
-let currentQ = generateAIQuestion(level);
+// ================= GAME =================
+let score = 0;
+let enemyScore = 0;
+let i = 0;
 
-// 👤 PROFIL
-function updateProfile(){
+// 🧠 IA QUI POSE QUESTIONS (DYNAMIC)
+function AIQuestion(level){
 
-document.getElementById("player").innerText =
-"👤 " + player;
+let pool = [
+{q:"2+2=?",a:["3","4","5"],c:1},
+{q:"5-2=?",a:["2","3","4"],c:1},
+{q:"10/2=?",a:["2","5","10"],c:1},
+{q:"3+6=?",a:["8","9","10"],c:1}
+];
 
-document.getElementById("profile").innerText =
-`⭐ Niveau: ${level} | XP: ${xp} | Score: ${score}`;
+return pool[Math.floor(Math.random()*pool.length)];
 }
 
-// LOAD
+let currentQ = AIQuestion(1);
+
+// ================= LOAD =================
 function load(){
 
 document.getElementById("question").innerText = currentQ.q;
 
-let html = "";
+let html="";
 
 currentQ.a.forEach((a,n)=>{
 html += `<button onclick="check(${n})">${a}</button>`;
 });
 
 document.getElementById("answers").innerHTML = html;
-document.getElementById("result").innerText = "";
 
-updateProfile();
+document.getElementById("info").innerText =
+"👤 " + player + " vs " + opponent;
+
 }
 
-// CHECK
+// ================= CHECK =================
 function check(n){
 
 if(n === currentQ.c){
 score++;
-xp += 10;
 document.getElementById("result").innerText = "✅ Correct";
 }else{
-xp += 3;
 document.getElementById("result").innerText = "❌ Faux";
 }
 
+// duel fake update
+enemyScore += Math.floor(Math.random()*2);
+
 document.querySelectorAll("#answers button").forEach(b=>b.disabled=true);
 
-// LEVEL SYSTEM
-if(xp >= level * 50){
-level++;
-xp = 0;
-alert("🔥 Niveau supérieur !");
 }
 
-saveProgress();
-addWorldScore();
-}
-
-// NEXT QUESTION
+// ================= NEXT =================
 function next(){
 
-currentQ = generateAIQuestion(level);
+i++;
+currentQ = AIQuestion(1);
 
 document.querySelectorAll("#answers button").forEach(b=>b.disabled=false);
 
 load();
 }
 
-// 💾 SAVE
-function saveProgress(){
-localStorage.setItem("progress", JSON.stringify({level,xp}));
-}
+// ================= WORLD SCORE =================
+function sendScore(){
 
-// 🌍 COMPÉTITION MONDIALE (SIMULATION)
-function addWorldScore(){
-
-let world = JSON.parse(localStorage.getItem("world") || "[]");
+let world = JSON.parse(localStorage.getItem("world")||"[]");
 
 world.push({
 name:player,
 score:score,
-level:level,
 time:new Date().toLocaleTimeString()
 });
 
@@ -178,26 +167,35 @@ world.sort((a,b)=>b.score-a.score);
 
 world = world.slice(0,10);
 
-localStorage.setItem("world", JSON.stringify(world));
+localStorage.setItem("world",JSON.stringify(world));
+
+alert("🌍 Score envoyé !");
 }
 
-function showWorld(){
+// ================= CHAT =================
+function sendMsg(){
 
-let world = JSON.parse(localStorage.getItem("world") || "[]");
+let msg = document.getElementById("msg").value;
+if(!msg) return;
 
-document.getElementById("world").innerHTML =
-world.map((p,i)=>
-`🏆 ${i+1}. ${p.name} - ${p.score} pts (lvl ${p.level})`
-).join("<br>") || "Aucun joueur";
+if(ws){
+ws.send(JSON.stringify({
+type:"chat",
+msg
+}));
 }
 
-// HOME
-function home(){
-window.location.href="index.html";
+addChat(player + ": " + msg);
+document.getElementById("msg").value="";
 }
 
-// INIT
-updateProfile();
+function addChat(text){
+
+let div = document.getElementById("chat");
+div.innerHTML += "<p>" + text + "</p>";
+}
+
+// ================= INIT =================
 load();
 
 </script>
