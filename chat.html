@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chat & Duel</title>
+<title>Realtime Chat</title>
 
 <style>
 body{
@@ -11,175 +11,103 @@ body{
   color:white;
   text-align:center;
 }
-input{
-  width:70%;
-  padding:10px;
-  margin:5px;
-}
-button{
+input,button{
   padding:10px;
   width:80%;
   margin:5px;
-  border-radius:10px;
 }
-.box{
-  margin-top:20px;
-  border-top:1px solid #334155;
-  padding-top:15px;
+#chat{
+  margin-top:10px;
+  text-align:left;
+  padding:10px;
 }
 </style>
 </head>
 
 <body>
 
-<h2>💬 Social Hub</h2>
+<h2>💬 Chat Temps Réel</h2>
 
-<p id="profile"></p>
+<input id="name" placeholder="Pseudo">
+<input id="room" placeholder="Salle (ex: math)">
+<button onclick="join()">Rejoindre salle</button>
 
-<!-- CHAT -->
-<div class="box">
-<h3>💬 Chat</h3>
+<div id="status"></div>
 
 <input id="msg" placeholder="Message">
-<button onclick="sendMsg()">Envoyer</button>
+<button onclick="send()">Envoyer</button>
+
+<button onclick="match()">⚔️ Matchmaking</button>
 
 <div id="chat"></div>
-</div>
-
-<!-- DUEL INVITATION -->
-<div class="box">
-<h3>⚔️ Invitations Duel</h3>
-
-<input id="enemy" placeholder="Nom adversaire">
-<button onclick="invite()">Envoyer invitation</button>
-
-<div id="invites"></div>
-</div>
-
-<button onclick="home()">🏠 Accueil</button>
 
 <script>
 
-// 👤 joueur
-let player = localStorage.getItem("player") || "Anonyme";
+let ws;
+let currentRoom = "";
 
-// 📊 profil intelligent simple
-let data = JSON.parse(localStorage.getItem("progress") || "{}");
+function join(){
 
-let level = data.level || 1;
-let xp = data.xp || 0;
+let name = document.getElementById("name").value;
+let room = document.getElementById("room").value;
 
-// PROFILE DISPLAY
-function showProfile(){
+ws = new WebSocket("ws://localhost:3000");
 
-let rank = level >= 5 ? "🔥 Pro" : level >= 3 ? "⚡ Intermédiaire" : "🟢 Débutant";
+ws.onopen = () => {
 
-document.getElementById("profile").innerHTML =
-`👤 ${player} | Niveau: ${level} | XP: ${xp} | Rank: ${rank}`;
+ws.send(JSON.stringify({
+type:"join",
+name,
+room
+}));
+
+currentRoom = room;
+
+document.getElementById("status").innerText =
+"🟢 Connecté à " + room;
+};
+
+ws.onmessage = (msg) => {
+
+let data = JSON.parse(msg.data);
+
+if(data.type === "chat"){
+add(`${data.name}: ${data.msg}`);
 }
 
-showProfile();
+if(data.type === "system"){
+add("🔔 " + data.msg);
+}
 
+if(data.type === "match_found"){
+add("⚔️ Match trouvé : " + data.room);
+}
+};
+}
 
-// 💬 CHAT
-function sendMsg(){
+function send(){
 
 let msg = document.getElementById("msg").value;
-if(!msg) return;
 
-let chat = JSON.parse(localStorage.getItem("chat") || "[]");
+ws.send(JSON.stringify({
+type:"chat",
+msg
+}));
 
-chat.push({
-user: player,
-msg: msg,
-time: new Date().toLocaleTimeString()
-});
-
-localStorage.setItem("chat", JSON.stringify(chat));
-
-document.getElementById("msg").value = "";
-loadChat();
+document.getElementById("msg").value="";
 }
 
-function loadChat(){
+function match(){
 
-let chat = JSON.parse(localStorage.getItem("chat") || "[]");
-
-document.getElementById("chat").innerHTML =
-chat.slice(-15).map(m=>
-`<p><b>${m.user}</b>: ${m.msg}</p>`
-).join("");
+ws.send(JSON.stringify({
+type:"match"
+}));
 }
 
-loadChat();
+function add(text){
 
-
-// ⚔️ INVITATION DUEL
-function invite(){
-
-let enemy = document.getElementById("enemy").value;
-if(!enemy) return;
-
-let invites = JSON.parse(localStorage.getItem("invites") || "[]");
-
-invites.push({
-from: player,
-to: enemy,
-status: "pending"
-});
-
-localStorage.setItem("invites", JSON.stringify(invites));
-
-document.getElementById("enemy").value = "";
-
-loadInvites();
-}
-
-function loadInvites(){
-
-let invites = JSON.parse(localStorage.getItem("invites") || "[]");
-
-let html = "";
-
-invites.forEach((i,index)=>{
-
-html += `
-<p>
-⚔️ ${i.from} → ${i.to}
-<br>
-Status: ${i.status}
-<br>
-<button onclick="accept(${index})">Accepter</button>
-</p>
-`;
-});
-
-document.getElementById("invites").innerHTML =
-html || "Aucune invitation";
-}
-
-// accepter duel
-function accept(i){
-
-let invites = JSON.parse(localStorage.getItem("invites") || "[]");
-
-invites[i].status = "accepted";
-
-localStorage.setItem("invites", JSON.stringify(invites));
-
-// lancer duel
-localStorage.setItem("mode","duel");
-localStorage.setItem("opponent",invites[i].from);
-
-window.location.href="quiz.html";
-}
-
-loadInvites();
-
-
-// 🏠 home
-function home(){
-window.location.href="index.html";
+let div = document.getElementById("chat");
+div.innerHTML += "<p>" + text + "</p>";
 }
 
 </script>
