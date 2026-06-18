@@ -2,82 +2,26 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quiz Startup</title>
-
-<style>
-body{
-  font-family:Arial;
-  background:#0f172a;
-  color:white;
-  text-align:center;
-}
-button{
-  padding:12px;
-  width:80%;
-  margin:10px;
-  border-radius:10px;
-}
-input{padding:10px;width:80%}
-</style>
+<title>Quiz Start</title>
 </head>
 
-<body>
+<body style="font-family:Arial;text-align:center;background:#0f172a;color:white">
 
-<h1>🌍 Quiz Startup</h1>
+<h1>🌍 Quiz App</h1>
 
-<h3>👤 Connexion joueur</h3>
-<input id="name" placeholder="Pseudo"><br>
-<button onclick="startSolo()">Solo</button>
+<input id="name" placeholder="Pseudo"><br><br>
 
-<h3>⚔️ Duel (simulation)</h3>
-<input id="p2" placeholder="Adversaire"><br>
-<button onclick="startDuel()">Lancer duel</button>
-
-<h3>💬 Chat</h3>
-<button onclick="goChat()">Accéder chat</button>
-
-<h3>🏆 Classement</h3>
-<div id="ranking"></div>
+<button onclick="start()">Commencer</button>
 
 <script>
 
-// 🔥 sécurité anti écran blanc
-window.onerror = function(){
-  document.body.innerHTML = "<h2>❌ Erreur détectée - recharge la page</h2>";
-};
+function start(){
+let name = document.getElementById("name").value;
+if(!name) name = "Anonyme";
 
-// SOLO
-function startSolo(){
-let name = document.getElementById("name").value || "Anonyme";
 localStorage.setItem("player", name);
-localStorage.setItem("mode","solo");
-window.location.href="quiz.html";
+window.location.href = "quiz.html";
 }
-
-// DUEL
-function startDuel(){
-let p2 = document.getElementById("p2").value || "CPU";
-
-localStorage.setItem("player","Joueur1");
-localStorage.setItem("opponent",p2);
-localStorage.setItem("mode","duel");
-
-window.location.href="quiz.html";
-}
-
-// CHAT
-function goChat(){
-window.location.href="chat.html";
-}
-
-// ranking
-function showRanking(){
-let r = JSON.parse(localStorage.getItem("ranking")||"[]");
-document.getElementById("ranking").innerHTML =
-r.map((p,i)=>`🏆 ${i+1}. ${p.name} - ${p.score}`).join("<br>");
-}
-
-showRanking();
 
 </script>
 
