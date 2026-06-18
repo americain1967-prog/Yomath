@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapitre</title>
+
+<style>
+body{
+  font-family:Arial;
+  background:#0f172a;
+  color:white;
+  text-align:center;
+}
+
+button{
+  padding:12px;
+  width:80%;
+  margin:6px;
+  border:none;
+  border-radius:10px;
+  background:#2563eb;
+  color:white;
+}
+</style>
+</head>
+
+<body>
+
+<h2>📚 Chapitre</h2>
+
+<p id="info"></p>
+
+<h3>🎯 Actions</h3>
+
+<button onclick="go('cours.html')">📖 Cours du chapitre</button>
+<button onclick="go('quiz.html')">🎮 Quiz du chapitre</button>
+<button onclick="go('devoir.html')">📝 Devoir</button>
+<button onclick="go('correction.html')">✅ Correction</button>
+<button onclick="go('chat.html')">💬 Chat du chapitre</button>
+
+<hr>
+
+<h3>🧠 Résumé IA</h3>
+<p id="ai"></p>
+
+<script>
+
+// récupération des données
+let player = localStorage.getItem("player");
+let classe = localStorage.getItem("classe");
+let matiere = localStorage.getItem("matiere");
+let chapitre = localStorage.getItem("chapitre");
+
+// affichage info
+document.getElementById("info").innerText =
+player + " | " + classe + " | " + matiere + " | " + chapitre;
+
+// IA simple de contexte
+let aiText = "";
+
+if(matiere === "math"){
+aiText = "📊 Ce chapitre contient des exercices de raisonnement et calcul.";
+}
+
+if(matiere === "pc"){
+aiText = "⚡ Ce chapitre traite des phénomènes physiques et énergie.";
+}
+
+if(matiere === "svt"){
+aiText = "🧬 Ce chapitre parle du vivant et des systèmes biologiques.";
+}
+
+document.getElementById("ai").innerText = aiText;
+
+// navigation
+function go(page){
+window.location.href = page;
+}
+
+</script>
+
+</body>
+</html>
