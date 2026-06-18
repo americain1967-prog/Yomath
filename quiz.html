@@ -2,14 +2,39 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quiz Game</title>
+<title>Quiz Startup Pro</title>
+
+<style>
+body{
+  font-family:Arial;
+  background:#0f172a;
+  color:white;
+  text-align:center;
+}
+button{
+  padding:10px;
+  width:80%;
+  margin:6px;
+  border-radius:10px;
+}
+input{
+  padding:8px;
+  width:75%;
+}
+.box{
+  margin-top:15px;
+  border-top:1px solid #334155;
+  padding-top:10px;
+}
+</style>
 </head>
 
-<body style="font-family:Arial;text-align:center;background:#0f172a;color:white">
+<body>
 
-<h2>🧠 Quiz Game</h2>
+<h2>🧠 Quiz Startup Pro</h2>
 
 <p id="info"></p>
+<p id="profile"></p>
 
 <p id="question"></p>
 <div id="answers"></div>
@@ -17,52 +42,72 @@
 <p id="result"></p>
 
 <button onclick="next()">➡️ Suivant</button>
+<button onclick="openChat()">💬 Chat</button>
+<button onclick="home()">🏠 Accueil</button>
+
+<!-- CHAT SIMPLE -->
+<div class="box">
+<h3>💬 Chat rapide</h3>
+<input id="msg" placeholder="Message">
+<button onclick="sendMsg()">Envoyer</button>
+<div id="chat"></div>
+</div>
+
+<!-- DUEL INVITE -->
+<div class="box">
+<h3>⚔️ Duel invitation</h3>
+<input id="enemy" placeholder="Nom adversaire">
+<button onclick="invite()">Inviter</button>
+<div id="invites"></div>
+</div>
 
 <script>
 
 let player = localStorage.getItem("player") || "Anonyme";
-let mode = localStorage.getItem("mode") || "solo";
-let opponent = localStorage.getItem("opponent") || "CPU";
 
-// scores
-let scoreP1 = 0;
-let scoreP2 = 0;
+// 📊 profil
+let data = JSON.parse(localStorage.getItem("progress") || "{}");
+let level = data.level || 1;
+let xp = data.xp || 0;
 
+// stats quiz
 let score = 0;
 let i = 0;
-let turn = 1;
 
-// questions simples (IA légère)
-function generateQuestion(){
+// IA SIMPLE (questions dynamiques)
+function generateQuestion(lvl){
 
-let pool = [
-{q:"2 + 2 ?", a:["3","4","5"], c:1},
-{q:"5 - 1 ?", a:["4","3","2"], c:0},
-{q:"10 / 2 ?", a:["2","5","10"], c:1},
-{q:"3 + 3 ?", a:["5","6","7"], c:1},
-{q:"7 - 2 ?", a:["4","5","6"], c:1}
+let easy = [
+{q:"2+2=?",a:["3","4","5"],c:1,exp:"2+2=4"},
+{q:"5-1=?",a:["4","3","2"],c:0,exp:"5-1=4"}
 ];
+
+let med = [
+{q:"10/2=?",a:["2","5","10"],c:1,exp:"10÷2=5"},
+{q:"3+3=?",a:["5","6","7"],c:1,exp:"3+3=6"}
+];
+
+let hard = [
+{q:"18/3=?",a:["5","6","7"],c:1,exp:"18÷3=6"},
+{q:"25-5*2=?",a:["10","15","20"],c:0,exp:"priorité multiplication"}
+];
+
+let pool = lvl <= 2 ? easy : lvl <= 4 ? med : hard;
 
 return pool[Math.floor(Math.random()*pool.length)];
 }
 
-let currentQ = generateQuestion();
+let currentQ = generateQuestion(level);
 
-// info
-document.getElementById("info").innerText =
-mode === "duel"
-? `⚔️ Duel: ${player} vs ${opponent}`
-: `🎮 Joueur: ${player}`;
+// 🧠 PROFIL
+function updateProfile(){
 
-// LOAD
-function load(){
-
-if(i >= 10){
-endGame();
-return;
+document.getElementById("profile").innerHTML =
+`👤 ${player} | Niveau: ${level} | XP: ${xp} | Score: ${score}`;
 }
 
-currentQ = generateQuestion();
+// LOAD QUESTION
+function load(){
 
 document.getElementById("question").innerText = currentQ.q;
 
@@ -75,71 +120,132 @@ html += `<button onclick="check(${n})">${a}</button>`;
 document.getElementById("answers").innerHTML = html;
 document.getElementById("result").innerText = "";
 
+updateProfile();
+loadChat();
+loadInvites();
 }
 
-// CHECK
 function check(n){
 
-if(mode === "duel"){
-
-    if(turn === 1){
-        if(n === currentQ.c) scoreP1++;
-        document.getElementById("result").innerText = "👉 Tour adversaire";
-        turn = 2;
-    } 
-    else {
-        if(n === currentQ.c) scoreP2++;
-        document.getElementById("result").innerText = "👉 Ton tour";
-        turn = 1;
-        i++;
-        load();
-    }
-
+if(n === currentQ.c){
+score++;
+xp += 10;
+document.getElementById("result").innerText = "✅ " + currentQ.exp;
 }else{
-
-    if(n === currentQ.c){
-        score++;
-        document.getElementById("result").innerText = "✅ Correct";
-    }else{
-        document.getElementById("result").innerText = "❌ Faux";
-    }
-
-}
+xp += 3;
+document.getElementById("result").innerText = "❌ " + currentQ.exp;
 }
 
-// NEXT
+document.querySelectorAll("#answers button").forEach(b=>b.disabled=true);
+
+// niveau auto
+if(xp >= level * 40){
+level++;
+xp = 0;
+alert("🔥 Niveau supérieur !");
+}
+
+saveProgress();
+}
+
 function next(){
 
-if(mode !== "duel"){
-i++;
+currentQ = generateQuestion(level);
+
+document.querySelectorAll("#answers button").forEach(b=>b.disabled=false);
+
 load();
 }
+
+// 💾 save
+function saveProgress(){
+localStorage.setItem("progress", JSON.stringify({level,xp}));
 }
 
-// END GAME
-function endGame(){
+// ================= CHAT =================
+function sendMsg(){
 
-document.getElementById("question").innerText = "🏁 Fin du Quiz";
-document.getElementById("answers").innerHTML = "";
+let msg = document.getElementById("msg").value;
+if(!msg) return;
 
-if(mode === "duel"){
+let chat = JSON.parse(localStorage.getItem("chat")||"[]");
 
-document.getElementById("result").innerHTML =
-`<h3>${player}: ${scoreP1}</h3>
-<h3>${opponent}: ${scoreP2}</h3>`;
+chat.push({user:player,msg,time:new Date().toLocaleTimeString()});
 
-}else{
+localStorage.setItem("chat",JSON.stringify(chat));
 
-document.getElementById("result").innerHTML =
-`🎯 Score: ${score}`;
+document.getElementById("msg").value="";
+loadChat();
 }
 
+function loadChat(){
+
+let chat = JSON.parse(localStorage.getItem("chat")||"[]");
+
+document.getElementById("chat").innerHTML =
+chat.slice(-10).map(m=>`<p><b>${m.user}</b>: ${m.msg}</p>`).join("");
 }
 
-// START
+// ================= DUEL INVITE =================
+function invite(){
+
+let enemy = document.getElementById("enemy").value;
+if(!enemy) return;
+
+let invites = JSON.parse(localStorage.getItem("invites")||"[]");
+
+invites.push({
+from:player,
+to:enemy,
+status:"pending"
+});
+
+localStorage.setItem("invites",JSON.stringify(invites));
+
+document.getElementById("enemy").value="";
+loadInvites();
+}
+
+function loadInvites(){
+
+let invites = JSON.parse(localStorage.getItem("invites")||"[]");
+
+document.getElementById("invites").innerHTML =
+invites.slice(-3).map((i,k)=>
+`⚔️ ${i.from} → ${i.to} (${i.status}) <br>
+<button onclick="accept(${k})">Accepter</button>`
+).join("") || "Aucune invitation";
+}
+
+function accept(i){
+
+let invites = JSON.parse(localStorage.getItem("invites")||"[]");
+
+invites[i].status = "accepted";
+
+localStorage.setItem("invites",JSON.stringify(invites));
+
+localStorage.setItem("mode","duel");
+localStorage.setItem("opponent",invites[i].from);
+
+alert("⚔️ Duel lancé !");
+}
+
+// navigation
+function home(){
+window.location.href="index.html";
+}
+
+function openChat(){
+alert("💬 Chat déjà intégré en bas");
+}
+
+// INIT
+updateProfile();
 load();
 
 </script>
 
 </body>
 </html>
+    
