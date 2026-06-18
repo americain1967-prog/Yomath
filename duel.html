@@ -2,32 +2,30 @@
 <html>
 <body style="font-family:Arial;background:#0f172a;color:white;text-align:center">
 
-<h2>⚔️ Duel Quiz</h2>
+<h2>⚔️ Duel Code Match</h2>
 
-<p id="q">2 + 2 = ?</p>
+<input id="code" placeholder="Code match">
 
-<button onclick="play(3)">3</button>
-<button onclick="play(4)">4</button>
-<button onclick="play(5)">5</button>
+<button onclick="create()">Créer</button>
+<button onclick="join()">Rejoindre</button>
 
-<p id="r"></p>
+<p id="out"></p>
 
 <script>
 
-function play(n){
-
-let ai = Math.random() > 0.5 ? 4 : 3;
-
-if(n == 4 && ai != 4){
-document.getElementById("r").innerText="🏆 Tu gagnes";
-}
-else if(n == ai){
-document.getElementById("r").innerText="🤝 Égalité";
-}
-else{
-document.getElementById("r").innerText="🤖 IA gagne";
+function create(){
+let c=Math.floor(Math.random()*9999);
+localStorage.setItem("match",c);
+document.getElementById("out").innerText="Code: "+c;
 }
 
+function join(){
+let c=document.getElementById("code").value;
+if(c==localStorage.getItem("match")){
+document.getElementById("out").innerText="⚔️ Match OK";
+}else{
+document.getElementById("out").innerText="❌ Code faux";
+}
 }
 
 </script>
