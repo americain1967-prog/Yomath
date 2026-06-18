@@ -2,22 +2,33 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quiz IA</title>
+<title>Quiz IA Avancé</title>
 
 <style>
-body{font-family:Arial;background:#0f172a;color:white;text-align:center}
-button{padding:10px;width:80%;margin:6px;border-radius:10px}
+body{
+  font-family:Arial;
+  background:#0f172a;
+  color:white;
+  text-align:center;
+}
+button{
+  padding:10px;
+  width:80%;
+  margin:6px;
+  border-radius:10px;
+}
 #explain{margin:15px;color:#38bdf8}
 </style>
 </head>
 
 <body>
 
-<h2>🧠 Quiz Intelligent + Coach</h2>
+<h2>🧠 Quiz IA Avancé</h2>
 
 <p id="player"></p>
 <p id="level"></p>
 <p id="xp"></p>
+<p id="profile"></p>
 
 <div id="score"></div>
 
@@ -31,157 +42,142 @@ button{padding:10px;width:80%;margin:6px;border-radius:10px}
 
 <script>
 
-// 👤 joueur
 let player = localStorage.getItem("player") || "Anonyme";
 
-// 📊 progression
+// 📊 profil intelligent
 let data = JSON.parse(localStorage.getItem("progress") || "{}");
 
 let level = data.level || 1;
 let xp = data.xp || 0;
-
 let score = 0;
+
 let i = 0;
 let mistakes = [];
 
-// 🧠 questions avec explications
-const questions = [
-{
-q:"2+2=?",
-a:["3","4","5"],
-c:1,
-exp:"2+2 = 4 car on additionne les deux nombres."
-},
-{
-q:"Capitale BF ?",
-a:["Ouaga","Paris","Accra"],
-c:0,
-exp:"La capitale du Burkina Faso est Ouagadougou."
-},
-{
-q:"10/2=?",
-a:["2","5","10"],
-c:1,
-exp:"10 divisé par 2 donne 5."
-}
+let currentQ = null;
+
+// 🧠 IA génération questions
+function generateQuestion(level){
+
+let easy = [
+{q:"2+2=?",a:["3","4","5"],c:1,exp:"2+2 = 4"},
+{q:"5-1=?",a:["4","3","2"],c:0,exp:"5-1 = 4"}
 ];
 
-// affichage joueur
-document.getElementById("player").innerText = "👤 " + player;
+let medium = [
+{q:"10/2=?",a:["2","5","10"],c:1,exp:"10 divisé par 2 = 5"},
+{q:"12/3=?",a:["3","4","6"],c:1,exp:"12/3 = 4"}
+];
 
-// LOAD
-function load(){
+let hard = [
+{q:"18/3+2=?",a:["6","8","7"],c:0,exp:"18/3=6 puis +2"},
+{q:"25-5*2=?",a:["10","15","20"],c:0,exp:"Priorité multiplication"}
+];
 
-if(i >= questions.length){
-end();
-return;
+let pool;
+
+if(level <= 2) pool = easy;
+else if(level <= 4) pool = medium;
+else pool = hard;
+
+return pool[Math.floor(Math.random()*pool.length)];
 }
 
-document.getElementById("question").innerText = questions[i].q;
+// 👤 init joueur
+document.getElementById("player").innerText = "👤 " + player;
+
+// 🔥 génération première question
+currentQ = generateQuestion(level);
+load();
+
+// 📥 LOAD
+function load(){
+
+document.getElementById("question").innerText = currentQ.q;
 
 let html="";
-questions[i].a.forEach((a,n)=>{
+currentQ.a.forEach((a,n)=>{
 html += `<button onclick="check(${n})">${a}</button>`;
 });
 
 document.getElementById("answers").innerHTML = html;
-
 document.getElementById("explain").innerText = "";
 
 updateUI();
 }
 
-// CHECK
+// ✅ CHECK
 function check(n){
 
-let q = questions[i];
-
-if(n === q.c){
+if(n === currentQ.c){
 score++;
 xp += 10;
-document.getElementById("explain").innerText = "✅ Correct ! " + q.exp;
+document.getElementById("explain").innerText = "✅ Correct ! " + currentQ.exp;
 }else{
-xp += 2;
-mistakes.push(q);
-document.getElementById("explain").innerText = "❌ Faux ! " + q.exp;
+xp += 3;
+mistakes.push(currentQ);
+document.getElementById("explain").innerText = "❌ Faux ! " + currentQ.exp;
 }
 
 // désactiver boutons
-let buttons = document.querySelectorAll("button");
-buttons.forEach(b=>b.disabled = true);
+document.querySelectorAll("#answers button").forEach(b=>b.disabled=true);
 
 }
 
-// NEXT
+// ➡️ NEXT
 function next(){
+
 i++;
 
+// nouvelle question IA
+currentQ = generateQuestion(level);
+
 // réactiver boutons
-let buttons = document.querySelectorAll("button");
-buttons.forEach(b=>b.disabled = false);
+document.querySelectorAll("#answers button").forEach(b=>b.disabled=false);
 
 load();
+checkLevel();
 }
 
-// FIN
-function end(){
+// 📈 NIVEAU AUTOMATIQUE
+function checkLevel(){
 
-document.getElementById("question").innerText = "🎉 FIN DU QUIZ";
-document.getElementById("answers").innerHTML = "";
-document.getElementById("explain").innerText = "";
-
-// montée niveau
 if(xp >= level * 50){
 level++;
 xp = 0;
 alert("🔥 Niveau supérieur !");
 }
-
-// sauvegarde progression
-localStorage.setItem("progress", JSON.stringify({
-level: level,
-xp: xp
-}));
-
-saveRanking();
-
-// 👉 ENTRAINEMENT AUTOMATIQUE
-if(mistakes.length > 0){
-startTraining();
-}else{
-document.getElementById("score").innerText = "Parfait ! Aucune erreur 🎯";
-}
 }
 
-// 🧠 ENTRAINEMENT
-function startTraining(){
+// 🧠 PROFIL INTELLIGENT
+function updateProfile(){
 
-i = 0;
-questions.splice(0, questions.length, ...mistakes);
+let weak = mistakes.length > 2 ? "Faiblesses en calcul" : "Bon niveau";
 
-mistakes = [];
-
-document.getElementById("question").innerText = "🧠 Mode entraînement (corrige tes erreurs)";
-load();
+document.getElementById("profile").innerText =
+"🧠 Profil: " + weak;
 }
 
 // UI
 function updateUI(){
+
 document.getElementById("score").innerText = "Score: " + score;
 document.getElementById("level").innerText = "Niveau: " + level;
 document.getElementById("xp").innerText = "XP: " + xp;
+
+updateProfile();
 }
 
-// classement
-function saveRanking(){
+// 💾 sauvegarde
+function save(){
+
+localStorage.setItem("progress", JSON.stringify({
+level, xp
+}));
 
 let ranking = JSON.parse(localStorage.getItem("ranking") || "[]");
 
-ranking.push({
-name: player,
-score: score,
-level: level
-});
+ranking.push({name:player,score,level});
 
 ranking.sort((a,b)=>b.score-a.score);
 ranking = ranking.slice(0,5);
@@ -189,13 +185,20 @@ ranking = ranking.slice(0,5);
 localStorage.setItem("ranking", JSON.stringify(ranking));
 }
 
-// home
+// 🏠 home
 function home(){
+save();
 window.location.href = "index.html";
 }
 
-// start
-load();
+// FIN automatique si besoin (optionnel)
+setInterval(()=>{
+
+if(score >= 10){
+save();
+}
+
+},3000);
 
 </script>
 
