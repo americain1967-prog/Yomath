@@ -2,25 +2,23 @@
 <html>
 <body style="background:#0f172a;color:white;text-align:center">
 
-<h2>📖 Cours</h2>
+<h2>📖 Cours IA</h2>
 
-<p id="cours"></p>
+<p id="c"></p>
 
 <script>
 
-let matiere = localStorage.getItem("matiere");
+let mat = localStorage.getItem("matiere");
+let classe = localStorage.getItem("classe");
 
-if(matiere === "math"){
-document.getElementById("cours").innerText = "Addition, division...";
-}
+let data = {
+math:"Algèbre + équations + fonctions",
+pc:"Énergie + électricité + température",
+svt:"Cellules + organes + respiration"
+};
 
-if(matiere === "pc"){
-document.getElementById("cours").innerText = "Température, énergie...";
-}
-
-if(matiere === "svt"){
-document.getElementById("cours").innerText = "Corps humain...";
-}
+document.getElementById("c").innerText =
+data[mat] + " | Classe: " + classe;
 
 </script>
 
