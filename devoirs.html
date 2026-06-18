@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<body style="background:#0f172a;color:white;text-align:center">
+
+<h2>📝 Devoir</h2>
+
+<p>2 + 3 = ?</p>
+
+<input id="rep">
+<button onclick="check()">Valider</button>
+
+<p id="res"></p>
+
+<script>
+function check(){
+let r = document.getElementById("rep").value;
+
+if(r == 5){
+document.getElementById("res").innerText = "✅ Correct";
+}else{
+document.getElementById("res").innerText = "❌ Faux";
+}
+}
+</script>
+
+</body>
+</html>
