@@ -2,23 +2,26 @@
 <html>
 <body style="font-family:Arial;background:#0f172a;color:white;text-align:center">
 
-<h2>💬 Chat Mondial</h2>
+<h2>💬 Chat mondial (temps réel)</h2>
 
-<input id="msg">
+<input id="msg" placeholder="écris un message">
 <button onclick="send()">Envoyer</button>
 
-<div id="box"></div>
+<div id="box" style="margin-top:20px;"></div>
 
 <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 
 <script>
 
-const socket = io("http://localhost:3000");
+// ⚠️ IMPORTANT : remplace par ton lien Codespace
+const socket = io("");
 
+// recevoir messages
 socket.on("chat",(data)=>{
 document.getElementById("box").innerHTML += "<br>" + data;
 });
 
+// envoyer message
 function send(){
 let m = document.getElementById("msg").value;
 socket.emit("chat", m);
