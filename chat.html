@@ -1,30 +1,47 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Chat temps réel</title>
+</head>
+
 <body style="font-family:Arial;background:#0f172a;color:white;text-align:center">
 
-<h2>💬 Chat mondial (temps réel)</h2>
+<h2>💬 Chat temps réel</h2>
 
-<input id="msg" placeholder="écris un message">
-<button onclick="send()">Envoyer</button>
+<input id="msg" placeholder="Écris un message" style="padding:10px;width:200px">
+<button onclick="send()" style="padding:10px">Envoyer</button>
 
-<div id="box" style="margin-top:20px;"></div>
+<div id="box" style="margin-top:20px"></div>
 
 <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 
 <script>
 
-// ⚠️ IMPORTANT : remplace par ton lien Codespace
-const socket = io("https://friendly-capybara-qv749qprvrpxc97j5-3000.app.github.dev/#");
+// ⚠️ IMPORTANT : remplace par TON lien Codespace
+const socket = io("");
+
+// connexion test
+socket.on("connect", () => {
+console.log("🟢 CONNECTÉ AU SERVEUR");
+});
 
 // recevoir messages
-socket.on("chat",(data)=>{
-document.getElementById("box").innerHTML += "<br>" + data;
+socket.on("chat", (data) => {
+document.getElementById("box").innerHTML +=
+"<p>💬 " + data + "</p>";
 });
 
 // envoyer message
-function send(){
-let m = document.getElementById("msg").value;
-socket.emit("chat", m);
+function send() {
+let msg = document.getElementById("msg").value;
+
+if(msg.trim() === "") return;
+
+socket.emit("chat", msg);
+
+// vider input
+document.getElementById("msg").value = "";
 }
 
 </script>
