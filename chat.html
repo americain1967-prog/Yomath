@@ -1,48 +1,85 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html>
 <head>
 <meta charset="UTF-8">
-<title>Chat temps réel</title>
+<title>Plateforme éducative</title>
 </head>
 
 <body style="font-family:Arial;background:#0f172a;color:white;text-align:center">
 
-<h2>💬 Chat temps réel</h2>
+<h2>🌍 Plateforme Éducative</h2>
 
-<input id="msg" placeholder="Écris un message" style="padding:10px;width:200px">
-<button onclick="send()" style="padding:10px">Envoyer</button>
+<!-- CHAT -->
+<input id="msg" placeholder="message">
+<button onclick="send()">Envoyer</button>
 
-<div id="box" style="margin-top:20px"></div>
+<div id="chat"></div>
+
+<hr>
+
+<!-- HEURE -->
+<h3>Heure locale</h3>
+<input id="zone" placeholder="Ex: Africa/Ouagadougou">
+<button onclick="getTime()">Voir heure</button>
+<div id="time"></div>
+
+<hr>
+
+<!-- IA -->
+<h3>🤖 IA éducative</h3>
+<select id="ai">
+<option value="maths">Maths</option>
+<option value="pc">Physique</option>
+<option value="svt">SVT</option>
+</select>
+<button onclick="askAI()">Demander</button>
+<div id="aiBox"></div>
 
 <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 
 <script>
 
-// ⚠️ IMPORTANT : remplace par TON lien Codespace
-const socket = io("https://friendly-capybara-qv749qprvrpxc97j5.github.dev");
+const socket = io("");
 
-// connexion test
-socket.on("connect", () => {
-console.log("🟢 CONNECTÉ AU SERVEUR");
+/* CHAT */
+
+socket.on("chat_history", data => {
+  data.forEach(show);
 });
 
-// recevoir messages
-socket.on("chat", (data) => {
-document.getElementById("box").innerHTML +=
-"<p>💬 " + data + "</p>";
-});
+socket.on("chat", show);
 
-// envoyer message
-function send() {
-let msg = document.getElementById("msg").value;
-
-if(msg.trim() === "") return;
-
-socket.emit("chat", msg);
-
-// vider input
-document.getElementById("msg").value = "";
+function show(msg){
+  document.getElementById("chat").innerHTML +=
+  `<p>[${msg.time}] <b>${msg.user}</b>: ${msg.text}</p>`;
 }
+
+function send(){
+  let msg = document.getElementById("msg").value;
+  socket.emit("chat", msg);
+}
+
+/* HEURE */
+
+function getTime(){
+  let zone = document.getElementById("zone").value;
+  socket.emit("get_time", zone);
+}
+
+socket.on("time_response", t => {
+  document.getElementById("time").innerText = t;
+});
+
+/* IA */
+
+function askAI(){
+  let type = document.getElementById("ai").value;
+  socket.emit("ai_question", type);
+}
+
+socket.on("ai_response", res => {
+  document.getElementById("aiBox").innerText = res;
+});
 
 </script>
 
