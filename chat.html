@@ -1,87 +1,43 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Plateforme éducative</title>
-</head>
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 
-<body style="font-family:Arial;background:#0f172a;color:white;text-align:center">
+<input id="name" placeholder="pseudo">
+<button onclick="login()">Entrer</button>
 
-<h2>🌍 Plateforme Éducative</h2>
-
-<!-- CHAT -->
-<input id="msg" placeholder="message">
+<input id="msg">
 <button onclick="send()">Envoyer</button>
+
+<input id="q" placeholder="question IA">
+<button onclick="ask()">IA</button>
 
 <div id="chat"></div>
 
-<hr>
-
-<!-- HEURE -->
-<h3>Heure locale</h3>
-<input id="zone" placeholder="Ex: Africa/Ouagadougou">
-<button onclick="getTime()">Voir heure</button>
-<div id="time"></div>
-
-<hr>
-
-<!-- IA -->
-<h3>🤖 IA éducative</h3>
-<select id="ai">
-<option value="maths">Maths</option>
-<option value="pc">Physique</option>
-<option value="svt">SVT</option>
-</select>
-<button onclick="askAI()">Demander</button>
-<div id="aiBox"></div>
-
-<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-
 <script>
+const socket = io("");
 
-const socket = io("https://bookish-cod-qv749qprvxr6h6wrx-3000.app.github.dev/#");
+function login(){
+  socket.emit("register", {pseudo: name.value, classe:"test"});
+  socket.emit("get_history");
+}
 
-/* CHAT */
-
-socket.on("chat_history", data => {
-  data.forEach(show);
+socket.on("history", data=>{
+data.forEach(show);
 });
 
 socket.on("chat", show);
 
-function show(msg){
-  document.getElementById("chat").innerHTML +=
-  `<p>[${msg.time}] <b>${msg.user}</b>: ${msg.text}</p>`;
+function show(m){
+chat.innerHTML += `<p>${m.user}: ${m.text}</p>`;
 }
 
 function send(){
-  let msg = document.getElementById("msg").value;
-  socket.emit("chat", msg);
+socket.emit("chat", msg.value);
 }
 
-/* HEURE */
-
-function getTime(){
-  let zone = document.getElementById("zone").value;
-  socket.emit("get_time", zone);
+function ask(){
+socket.emit("ai_chat", q.value);
 }
 
-socket.on("time_response", t => {
-  document.getElementById("time").innerText = t;
+socket.on("ai_reply", r=>{
+chat.innerHTML += "<p>IA: "+r+"</p>";
 });
-
-/* IA */
-
-function askAI(){
-  let type = document.getElementById("ai").value;
-  socket.emit("ai_question", type);
-}
-
-socket.on("ai_response", res => {
-  document.getElementById("aiBox").innerText = res;
-});
-
 </script>
-
-</body>
-</html>
