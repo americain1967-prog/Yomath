@@ -12,7 +12,7 @@
 <div id="chat"></div>
 
 <script>
-const socket = io("https://silver-waffle-77v5r9pq76p43x4wg-3000.app.github.dev/#");
+const socket = io(window.location.origin);
 
 function login(){
   socket.emit("register", {pseudo: name.value, classe:"test"});
